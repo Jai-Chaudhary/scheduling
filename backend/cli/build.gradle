@@ -1,0 +1,18 @@
+apply plugin: 'application'
+
+dependencies {
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
+
+  compile project(':configparser')
+  compile project(':simulator')
+  compile project(':library')
+}
+
+mainClassName = 'com.chaoxu.cli.Main'
+
+run{
+  standardInput = System.in
+  if (project.hasProperty('args')) {
+    args project.args.split('\\s+')
+  }
+}

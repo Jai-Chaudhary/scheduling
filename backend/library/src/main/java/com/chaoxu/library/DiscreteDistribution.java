@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Discrete distribution. Support is [base, base + pmf.size() - 1].
@@ -22,17 +25,30 @@ public class DiscreteDistribution {
     private List<Double> cdf = new ArrayList<>();
     // partialSum[i] is sum of k * pmf[k] for k >= i
     private List<Double> partialSum = new ArrayList<>();
+    private List<Double> pmf;
 
     @JsonCreator
     public static DiscreteDistribution parse(String name) {
         return DistributionParser.parse(name);
     }
+
+    @JsonCreator
+    public static DiscreteDistribution parse(Map<String, Object> props) {
+        DiscreteDistribution ret =  new DiscreteDistribution(
+                (int)props.get("base"),
+                (List<Double>)props.get("pmf"));
+        ret.name = (String)props.get("name");
+        return ret;
+    }
+
+
     /**
      * Constructor. We will normalize pmf and generate cdf.
      * suggestedMean is mainly used as slot size when
      * making appointments.
      */
     public DiscreteDistribution(int base, List<Double> pmf) {
+        this.pmf = pmf;
         this.base = base;
 
         double sum = pmf.stream().mapToDouble(x -> x).sum();
@@ -62,6 +78,7 @@ public class DiscreteDistribution {
      */
     public int sample(int lb, double u) {
         int x = Math.max(lb - base ,0);
+        if (x-1 >= cdf.size()) return lb;
         double y = x == 0 ? 0 : cdf.get(x-1);
 
         double q = u * (1-y) + y;
@@ -79,15 +96,33 @@ public class DiscreteDistribution {
      */
     public double expectation(int lb) {
         int x = Math.max(lb - base, 0);
+        if (x >= partialSum.size()) return lb;
         return partialSum.get(x) / (1 - (x == 0 ? 0 : cdf.get(x-1))) + base;
+    }
+
+    public int median(int lb) {
+        return sample(lb, .5);
+    }
+
+    public int median() {
+        return sample(base);
     }
 
     public double expectation() {
         return expectation(base);
     }
 
-    @JsonValue
     public String toString() {
         return name;
+    }
+
+    @JsonValue
+    public Map<String, Object> toJSON() {
+        Map<String, Object> ret = new HashMap<>();
+        ret.put("name", name);
+        ret.put("pmf", pmf);
+        ret.put("base", base);
+
+        return ret;
     }
 }

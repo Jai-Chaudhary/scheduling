@@ -73,6 +73,16 @@ public class Main {
             return mapper.writeValueAsString(ret);
         });
 
+        Spark.post("/simulate", (req, res) -> {
+            Blob blob = mapper.readValue(req.body(), Blob.class);
+            State state = blob.state;
+
+            Simulator.simulate(state, blob.lBits, null, true);
+            res.type("application/json");
+            res.header("Content-Encoding", "gzip");
+            return mapper.writeValueAsString(state);
+        });
+
         /**
          * This will return a list of frames, each frame contains:
          *      state: the state of that frame
@@ -88,6 +98,7 @@ public class Main {
         Spark.post("/simulate_frames", (req, res) -> {
             SimulateFramesReq r = mapper.readValue(req.body(), SimulateFramesReq.class);
             int step = r.step;
+            // System.out.println(r.data);
             Blob blob = mapper.readValue(r.data, Blob.class);
             State state = blob.state;
 

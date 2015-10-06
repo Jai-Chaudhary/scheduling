@@ -5,23 +5,28 @@ import com.chaoxu.library.Patient;
 public class BeginEvent extends Event {
     private Patient p;
     private Runner r;
+    private String m;
 
-    public BeginEvent(Patient p, Runner r) {
+    public BeginEvent(Patient p, String m, Runner r) {
         super(r.state.time);
         this.p = p;
         this.r = r;
+        this.m = m;
     }
 
     public void invoke() {
         p.begin = time;
+        p.machine = m;
         r.waitingRoom.get(p.site).remove(p);
-        assert r.curPatient.get(p.site) == null;
-        r.curPatient.put(p.site, p);
+        if (r.curPatient.get(p.site).get(m) != null) {
+            throw new RuntimeException("begin patient on occupied machine!");
+        }
+        r.curPatient.get(p.site).put(m, p);
     }
 
     @Override
     public String toString() {
-        return super.toString() + " " + p;
+        return super.toString() + " " + p + " " + p.site + " " + p.machine;
     }
 
     // Here we don't need to order BeginEvent with same

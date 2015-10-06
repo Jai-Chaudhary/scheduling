@@ -25,7 +25,7 @@ public class OptimizationEvent extends Event {
     public void invoke() {
         p.optimized = time;
         if (active()) {
-            int newSite = Optimizer.optimize(r.state, p, r.lBits);
+            String newSite = Optimizer.optimize(r.state, p, r.lBits);
             p.site = newSite;
         }
         r.patientsToOptimize.remove(p);

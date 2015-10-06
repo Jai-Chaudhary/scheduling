@@ -25,7 +25,7 @@ public class State {
     // list of patients
     public List<Patient> patients;
     // number of sites
-    public int sites;
+    public Map<String, List<String>> sites;
     // whether optimization is enabled
     // originally I thought to add an argument
     // for runner to turn on/off optimization.

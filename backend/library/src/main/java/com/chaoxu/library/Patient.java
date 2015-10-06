@@ -7,13 +7,14 @@ public class Patient {
     public String name;
     public String clazz;
     public int appointment;
-    public int originalSite;
+    public String originalSite;
     public DiscreteDistribution durationDistribution;
     public DiscreteDistribution latenessDistribution;
     public int id;
 
     // status, available to optimizer
-    public int site;
+    public String site;
+    public String machine;
     public Integer arrival;
     public Integer begin;
     public Integer completion;
@@ -40,6 +41,7 @@ public class Patient {
         id = p.id;
 
         site = p.site;
+        machine = p.machine;
         arrival = p.arrival;
         begin = p.begin;
         completion = p.completion;

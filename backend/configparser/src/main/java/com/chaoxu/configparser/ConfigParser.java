@@ -88,36 +88,38 @@ public class ConfigParser {
 
         List<Patient> ret = new ArrayList<>();
 
-        for (int s = 0; s < config.sites; s++) {
-            int curTime = config.horizon.begin;
-            while (curTime < config.horizon.end) {
-                int pIndex = pcDist.sample(rng.nextDouble());
-                PatientClass pc = patientClasses.get(pIndex);
+        for (String s : config.sites.keySet()) {
+            for (String m : config.sites.get(s)) {
+                int curTime = config.horizon.begin;
+                while (curTime < config.horizon.end) {
+                    int pIndex = pcDist.sample(rng.nextDouble());
+                    PatientClass pc = patientClasses.get(pIndex);
 
-                Patient p = new Patient();
-                p.name = String.format("P%d-%s", s, Util.toTime(curTime));
-                p.clazz = pc.name;
-                p.appointment = curTime;
-                p.originalSite = s;
-                p.site = s;
-                p.durationDistribution = pc.durationDistribution;
-                p.latenessDistribution = pc.latenessDistribution;
+                    Patient p = new Patient();
+                    p.name = String.format("P%s-%s-%s", s, m, Util.toTime(curTime));
+                    p.clazz = pc.name;
+                    p.appointment = curTime;
+                    p.originalSite = s;
+                    p.site = s;
+                    p.durationDistribution = pc.durationDistribution;
+                    p.latenessDistribution = pc.latenessDistribution;
 
-                p.duration = pc.durationDistribution.sample(rng.nextDouble());
-                p.lateness = pc.latenessDistribution.sample(rng.nextDouble());
+                    p.duration = pc.durationDistribution.sample(rng.nextDouble());
+                    p.lateness = pc.latenessDistribution.sample(rng.nextDouble());
 
-                p.volunteer = false;
+                    p.volunteer = false;
 
-                if (config.optimizer != null &&
-                        rng.nextDouble() < config.optimizer.volunteerProbability) {
-                    // patient volunteer
-                    p.volunteer = true;
+                    if (config.optimizer != null &&
+                            rng.nextDouble() < config.optimizer.volunteerProbability) {
+                        // patient volunteer
+                        p.volunteer = true;
+                            }
+                    ret.add(p);
+
+                    // notice double is implicitly converted to int with += operator
+                    curTime += pc.durationDistribution.expectation()
+                        + pc.slotOffsetDistribution.sample(rng.nextDouble());
                 }
-                ret.add(p);
-
-                // notice double is implicitly converted to int with += operator
-                curTime += pc.durationDistribution.expectation()
-                    + pc.slotOffsetDistribution.sample(rng.nextDouble());
             }
         }
 

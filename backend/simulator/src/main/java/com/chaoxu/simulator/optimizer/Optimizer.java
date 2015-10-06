@@ -14,7 +14,7 @@ import com.chaoxu.simulator.Evaluator;
 
 class Result {
     public SummaryStatistics stat;
-    public int site;
+    public String site;
 }
 
 public class Optimizer {
@@ -24,10 +24,10 @@ public class Optimizer {
             Patient patient, List<RandomBits> lBits) {
         Objective objective = Objective.objFactory(state.objective);
 
-        int originalSite = patient.site;
-        Map<Integer, SummaryStatistics> objDiff = new HashMap<>();
+        String originalSite = patient.site;
+        Map<String, SummaryStatistics> objDiff = new HashMap<>();
 
-        for (int site = 0; site < state.sites; site++) {
+        for (String site : state.sites.keySet()) {
             if (site != originalSite) {
                 SummaryStatistics stat = new SummaryStatistics();
                 for (RandomBits bits : lBits) {
@@ -47,7 +47,7 @@ public class Optimizer {
             addValue(0);
         }};
 
-        for (int site : objDiff.keySet()) {
+        for (String site : objDiff.keySet()) {
             SummaryStatistics stat = objDiff.get(site);
             double mean = stat.getMean();
             double delta = stat.getStandardDeviation() * confidenceLevel / Math.sqrt(stat.getN());
@@ -62,7 +62,7 @@ public class Optimizer {
         return best;
     }
 
-    public static int optimize(State state, Patient patient,
+    public static String optimize(State state, Patient patient,
             List<RandomBits> lBits) {
         Result result = bestSite(state, patient, lBits);
 

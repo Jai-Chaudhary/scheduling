@@ -1,10 +1,11 @@
 package com.chaoxu.configparser;
 
 import java.util.List;
+import java.util.Map;
 
 public class Config {
     public List<PatientClassConfig> patientClasses;
-    public int sites;
+    public Map<String, List<String>> sites;
     public Horizon horizon;
     public int seed;
     public OptimizerConfig optimizer;

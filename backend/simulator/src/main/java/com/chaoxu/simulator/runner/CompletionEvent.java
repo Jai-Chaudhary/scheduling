@@ -14,8 +14,12 @@ public class CompletionEvent extends Event {
 
     public void invoke() {
         p.completion = time;
-        assert r.curPatient.get(p.site) == p;
-        r.curPatient.put(p.site, null);
+        if (r.curPatient.get(p.site).get(p.machine) != p) {
+            System.err.println(p);
+            System.err.println(r.curPatient.get(p.site).get(p.machine));
+            throw new RuntimeException("Wrong patient on machine");
+        }
+        r.curPatient.get(p.site).put(p.machine, null);
     }
 
     @Override

@@ -34,9 +34,20 @@ public class DiscreteDistribution {
 
     @JsonCreator
     public static DiscreteDistribution parse(Map<String, Object> props) {
+        List<Double> pmf = new ArrayList<>();
+        List tmp = (List)props.get("pmf");
+        for (Object x : tmp) {
+            double t;
+            if (x instanceof Integer) {
+                t = (double)(int)x;
+            } else {
+                t = (double)x;
+            }
+            pmf.add(t);
+        }
         DiscreteDistribution ret =  new DiscreteDistribution(
                 (int)props.get("base"),
-                (List<Double>)props.get("pmf"));
+                pmf);
         ret.name = (String)props.get("name");
         return ret;
     }

@@ -33,9 +33,9 @@ public class Runner {
     // set of patients to arrive
     TreeSet<Patient> patientsToArrive;
     // patients in waiting room for each site
-    Map<Integer, TreeSet<Patient>> waitingRoom;
+    Map<String, TreeSet<Patient>> waitingRoom;
     // current patient under processing of each site
-    Map<Integer, Patient> curPatient =
+    Map<String, Map<String, Patient>> curPatient =
         new HashMap<>();
 
     State state;
@@ -64,8 +64,15 @@ public class Runner {
                     return ret != 0 ? ret : Integer.compare(p.id, q.id);
                 });
         curPatient = new HashMap<>();
+        for (String s : state.sites.keySet()) {
+            curPatient.put(s, new HashMap<>());
+            for (String m : state.sites.get(s)) {
+                curPatient.get(s).put(m, null);
+            }
+        }
+
         waitingRoom = new HashMap<>();
-        for (int s = 0; s < state.sites; s++) {
+        for (String s : state.sites.keySet()) {
             waitingRoom.put(s, new TreeSet<Patient>(
                         (Patient p, Patient q) -> {
                             int ret = Integer.compare(
@@ -87,8 +94,10 @@ public class Runner {
                     waitingRoom.get(p.site).add(p);
                     break;
                 case ToComplete:
-                    assert curPatient.get(p.site) == null;
-                    curPatient.put(p.site, p);
+                    if (curPatient.get(p.site).get(p.machine) != null) {
+                        throw new RuntimeException("Machine not idling");
+                    }
+                    curPatient.get(p.site).put(p.machine, p);
                     break;
             }
         }
@@ -116,17 +125,19 @@ public class Runner {
         }
     }
 
-    private boolean isBusy(int s) {
-        return curPatient.get(s) != null;
+    private boolean isBusy(String s, String m) {
+        return curPatient.get(s).get(m) != null;
     }
 
     public Event nextEvent() {
         Event ret = null;
 
         // BeginEvent
-        for (int s = 0; s < state.sites; s++) {
-            if (!isBusy(s) && !waitingRoom.get(s).isEmpty()) {
-                return new BeginEvent(waitingRoom.get(s).first(), this);
+        for (String s : state.sites.keySet()) {
+            for (String m : state.sites.get(s)) {
+                if (!isBusy(s, m) && !waitingRoom.get(s).isEmpty()) {
+                    return new BeginEvent(waitingRoom.get(s).first(), m, this);
+                }
             }
         }
 
@@ -141,10 +152,12 @@ public class Runner {
                         patientsToArrive.first(), this));
         }
         // CompletionEvent
-        for (int s = 0; s < state.sites; s++) {
-            if (curPatient.get(s) != null) {
-                ret = minEvent(ret, new CompletionEvent(
-                            curPatient.get(s), this));
+        for (String s : state.sites.keySet()) {
+            for (String m : state.sites.get(s)) {
+                if (curPatient.get(s).get(m) != null) {
+                    ret = minEvent(ret, new CompletionEvent(
+                                curPatient.get(s).get(m), this));
+                }
             }
         }
 

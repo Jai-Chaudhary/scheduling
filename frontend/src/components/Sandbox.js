@@ -35,7 +35,7 @@ export default React.createClass({
   },
   handleChange() {
     let newState = this.state.newFrame.state;
-    newState.patients[parseInt(this.state.patientSelect)].site = parseInt(this.state.siteSelect);
+    newState.patients[parseInt(this.state.patientSelect)].site = this.state.siteSelect;
     request.post('/get_animation_stats')
     .send({state: newState, lBits: this.props.lBits}).then(
       res => {
@@ -76,7 +76,7 @@ export default React.createClass({
     let newAnimation = newFrame.animation;
     let newStats = newFrame.stats;
 
-    let siteOptions = lodash.range(newState.sites).map(
+    let siteOptions = Object.keys(newState.sites).map(
       i => <option value={i} key={i}>Site {i}</option>
     );
 

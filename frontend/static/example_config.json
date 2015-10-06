@@ -15,7 +15,10 @@
       "latenessDistribution": "uniform(-1,1)"
     }
   ],
-  "sites": 3,
+  "sites": {
+    "55TH": ["MR1", "MR2"],
+    "YORK": ["MR1", "MR2"]
+  },
   "horizon": {
     "begin": 480,
     "end": 1200

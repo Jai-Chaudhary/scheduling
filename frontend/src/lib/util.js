@@ -29,7 +29,7 @@ export function ganttHelper(state, animation, stats) {
   }
 
   const nameScale = d3.scale.category10();
-  const waitScale = d3.scale.linear().domain([0, 120])
+  const waitScale = d3.scale.linear().domain([0, 90])
   .range(["green", "red"]);
 
   return <Gantt

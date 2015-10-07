@@ -14,7 +14,7 @@ app.debug = True
 
 def get_mins(dt):
     date = datetime.datetime.combine(dt.date(), datetime.time.min)
-    return round((dt - date).total_seconds())
+    return round((dt - date).total_seconds() / 60)
 
 def get_duration_distribution(service, slot):
     d = dist_coll.find_one({'name': 'Duration {} {}'.format(service, slot)})
@@ -100,7 +100,7 @@ def get_history_blob():
     patients = get_patients(schedule, volunteer_prob)
     state = {
         'time': 0,
-        'advancedTime': req['optimizer']['advanceTime'],
+        'advanceTime': req['optimizer']['advanceTime'],
         'patients': patients,
         'sites': get_sites(schedule),
         'optimization': req['optimizer']['active'],

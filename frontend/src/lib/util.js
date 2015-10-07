@@ -37,7 +37,7 @@ export function ganttHelper(state, animation, stats) {
     begin={d => toTime(d.begin)}
     end={d => toTime(d.completion)}
     row={d => d.site + " " + d.machine}
-    xlim={[toTime(420), toTime(1380)]}
+    xlim={[toTime(360), toTime(1380)]}
     time={toTime(state.time)}
     stroke={strokeCb}
     tip={d => `${d.name} wait ${stats[d.name]}`}

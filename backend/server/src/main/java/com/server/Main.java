@@ -47,7 +47,6 @@ public class Main {
                     Config.class);
             Blob blob = ConfigParser.parse(config);
             State state = blob.state;
-            Simulator.simulateTick(state);
 
             String blobStr = mapper.writeValueAsString(blob);
 
@@ -101,6 +100,7 @@ public class Main {
             // System.out.println(r.data);
             Blob blob = mapper.readValue(r.data, Blob.class);
             State state = blob.state;
+            Simulator.simulateTick(state);
 
             List<Map<String, Object>> frames = new ArrayList<>();
             frames.add(new HashMap<String, Object>() {{

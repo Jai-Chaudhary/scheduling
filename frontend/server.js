@@ -3,6 +3,7 @@ var WebpackDevServer = require('webpack-dev-server');
 var config = require('./webpack.config');
 
 var javaServer = "http://localhost:4567";
+var pythonServer = "http://localhost:5000";
 
 new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
@@ -11,7 +12,8 @@ new WebpackDevServer(webpack(config), {
   proxy: {
     '/configparser': javaServer,
     '/simulate_frames': javaServer,
-    '/get_animation_stats': javaServer
+    '/get_animation_stats': javaServer,
+    '/get_history_blob': pythonServer
   }
 }).listen(3000, '0.0.0.0', function (err, result) {
   if (err) {

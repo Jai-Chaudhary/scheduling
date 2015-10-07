@@ -1,0 +1,12 @@
+{
+  "day": "2013-04-15",
+  "seed": 15,
+  "volunteer_prob": 0.3,
+  "num_samples": 100,
+  "optimizer": {
+      "active": true,
+      "volunteerProbability": 0.5,
+      "objective": "l2",
+      "advanceTime": 60
+  }
+}

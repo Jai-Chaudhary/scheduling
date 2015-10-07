@@ -54,14 +54,14 @@ public class Runner {
                     int ret = Integer.compare(
                             p.appointment - state.advanceTime,
                             q.appointment - state.advanceTime);
-                    return ret != 0 ? ret : Integer.compare(p.id, q.id);
+                    return ret != 0 ? ret : p.name.compareTo(q.name);
                 });
         patientsToArrive = new TreeSet<>(
                 (Patient p, Patient q) -> {
                     int ret = Integer.compare(
                             p.appointment + p.lateness,
                             q.appointment + q.lateness);
-                    return ret != 0 ? ret : Integer.compare(p.id, q.id);
+                    return ret != 0 ? ret : p.name.compareTo(q.name);
                 });
         curPatient = new HashMap<>();
         for (String s : state.sites.keySet()) {
@@ -78,7 +78,7 @@ public class Runner {
                             int ret = Integer.compare(
                                     p.appointment,
                                     q.appointment);
-                            return ret != 0 ? ret : Integer.compare(p.id, q.id);
+                            return ret != 0 ? ret : p.name.compareTo(q.name);
                         }));
         }
 

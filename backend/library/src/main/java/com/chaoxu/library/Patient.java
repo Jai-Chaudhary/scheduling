@@ -1,8 +1,6 @@
 package com.chaoxu.library;
 
 public class Patient {
-    private static int nextId = 0;
-
     // available to optimizer
     public String name;
     public String clazz;
@@ -10,7 +8,6 @@ public class Patient {
     public String originalSite;
     public DiscreteDistribution durationDistribution;
     public DiscreteDistribution latenessDistribution;
-    public int id;
 
     // status, available to optimizer
     public String site;
@@ -28,7 +25,6 @@ public class Patient {
     public int lateness;
 
     public Patient() {
-        id = nextId++;
     }
 
     public Patient(Patient p) {
@@ -38,7 +34,6 @@ public class Patient {
         originalSite = p.originalSite;
         durationDistribution = p.durationDistribution;
         latenessDistribution = p.latenessDistribution;
-        id = p.id;
 
         site = p.site;
         machine = p.machine;

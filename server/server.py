@@ -39,7 +39,6 @@ def get_lateness_distribution():
 
 def get_patients(schedule, volunteer_prob):
     ret = []
-    nid = 0
     for x in schedule:
         p = {
             'name': x['mrn'],
@@ -48,7 +47,6 @@ def get_patients(schedule, volunteer_prob):
             'originalSite': x['site'],
             'durationDistribution': get_duration_distribution(x['service'], x['slot']),
             'latenessDistribution': get_lateness_distribution(),
-            'id': nid,
 
             'site': x['site'],
             'machine': None,
@@ -63,7 +61,6 @@ def get_patients(schedule, volunteer_prob):
             'lateness': x['lateness'] + lateness_offset,
         }
         ret.append(p)
-        nid += 1
     return ret
 
 def get_sites(schedule):

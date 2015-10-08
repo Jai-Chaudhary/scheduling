@@ -51,7 +51,6 @@ export default React.createClass({
     request.post('/get_history_blob')
       .send(JSON.parse(this.state.replayConfig)).then(
         res => {
-          console.log(JSON.parse(res.body.data));
           lBits = JSON.parse(res.body.data).lBits;
           return request.post('/simulate_frames')
           .send({data: res.body.data, step:step}).promise();
@@ -64,6 +63,7 @@ export default React.createClass({
   },
   componentWillUnmount() {
     config = this.state.config;
+    replayConfig = this.state.replayConfig;
   },
   render() {
     return (

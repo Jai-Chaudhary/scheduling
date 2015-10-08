@@ -24,6 +24,6 @@ public class CompletionEvent extends Event {
 
     @Override
     public String toString() {
-        return super.toString() + " " + p;
+        return super.toString() + " " + p + " " + p.site + " " + p.machine;
     }
 }

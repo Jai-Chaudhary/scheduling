@@ -44,7 +44,6 @@ public class Runner {
     private boolean debug;
 
     public Runner(State state, List<RandomBits> lBits, boolean debug) {
-
         this.state = state;
         this.lBits = lBits;
         this.debug = debug;
@@ -85,7 +84,12 @@ public class Runner {
         for (Patient p : state.patients) {
             switch(p.status()) {
                 case ToOptimize:
-                    patientsToOptimize.add(p);
+                    if (p.lateness <= -state.advanceTime) {
+                        p.optimized = p.appointment + p.lateness;
+                        patientsToArrive.add(p);
+                    } else {
+                        patientsToOptimize.add(p);
+                    }
                     break;
                 case ToArrive:
                     patientsToArrive.add(p);
@@ -117,10 +121,13 @@ public class Runner {
                 return true;
             }
 
-            state.time = e.time;
             if (debug) {
                 System.err.println(e);
             }
+            if (e.time < state.time) {
+                throw new RuntimeException("backward event");
+            }
+            state.time = e.time;
             e.invoke();
         }
     }
@@ -136,7 +143,8 @@ public class Runner {
         for (String s : state.sites.keySet()) {
             for (String m : state.sites.get(s)) {
                 if (!isBusy(s, m) && !waitingRoom.get(s).isEmpty()) {
-                    return new BeginEvent(waitingRoom.get(s).first(), m, this);
+                    Patient p = waitingRoom.get(s).first();
+                    return new BeginEvent(p, m, this);
                 }
             }
         }

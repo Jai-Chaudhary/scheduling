@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * support convolution.
  */
 public class DiscreteDistribution {
+    private static Map<String, DiscreteDistribution> registery = new HashMap<>();
     String name;
     private int base;
 
@@ -29,7 +30,12 @@ public class DiscreteDistribution {
 
     @JsonCreator
     public static DiscreteDistribution parse(String name) {
-        return DistributionParser.parse(name);
+        if (registery.containsKey(name)) {
+            return registery.get(name);
+        }
+        DiscreteDistribution ret = DistributionParser.parse(name);
+        registery.put(ret.name, ret);
+        return ret;
     }
 
     @JsonCreator
@@ -49,6 +55,8 @@ public class DiscreteDistribution {
                 (int)props.get("base"),
                 pmf);
         ret.name = (String)props.get("name");
+
+        registery.put(ret.name, ret);
         return ret;
     }
 
@@ -95,7 +103,7 @@ public class DiscreteDistribution {
         double q = u * (1-y) + y;
         int i = Collections.binarySearch(cdf, q);
         if (i < 0) i = -(i+1);
-        return base + i;
+        return Math.max(base + i, lb);
     }
 
     public int sample(double u) {
@@ -108,7 +116,8 @@ public class DiscreteDistribution {
     public double expectation(int lb) {
         int x = Math.max(lb - base, 0);
         if (x >= partialSum.size()) return lb;
-        return partialSum.get(x) / (1 - (x == 0 ? 0 : cdf.get(x-1))) + base;
+        return Math.max(partialSum.get(x) / (1 - (x == 0 ? 0 : cdf.get(x-1))) + base,
+                lb);
     }
 
     public int median(int lb) {
@@ -123,11 +132,11 @@ public class DiscreteDistribution {
         return expectation(base);
     }
 
+    @JsonValue
     public String toString() {
         return name;
     }
 
-    @JsonValue
     public Map<String, Object> toJSON() {
         Map<String, Object> ret = new HashMap<>();
         ret.put("name", name);

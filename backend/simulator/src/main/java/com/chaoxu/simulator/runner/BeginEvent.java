@@ -26,7 +26,7 @@ public class BeginEvent extends Event {
 
     @Override
     public String toString() {
-        return super.toString() + " " + p + " " + p.site + " " + p.machine;
+        return super.toString() + " " + p + " " + p.site + " " + m;
     }
 
     // Here we don't need to order BeginEvent with same

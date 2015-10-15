@@ -33,32 +33,30 @@ export default React.createClass({
     }
   },
   handleGo() {
-    let lBits;
     request.post('/configparser')
-      .send({data: this.state.config}).then(
+      .send(this.state.config).then(
         res => {
-          lBits = JSON.parse(res.body.data).lBits;
+          const state = res.body;
           return request.post('/simulate_frames')
-          .send({data: res.body.data, step:step}).promise();
+          .send(state).promise();
         }
       ).then(
         res => {
-          return this.props.handleToPlayroom(JSON.parse(res.body.data), lBits);
+          return this.props.handleToPlayroom(res.body.data);
         }
       );
   },
   handleReplayGo() {
-    let lBits;
     request.post('/get_history_blob')
       .send(JSON.parse(this.state.replayConfig)).then(
         res => {
-          lBits = JSON.parse(res.body.data).lBits;
+          const state = res.body;
           return request.post('/simulate_frames')
-          .send({data: res.body.data, step:step}).promise();
+          .send(state).promise();
         }
       ).then(
         res => {
-          return this.props.handleToPlayroom(JSON.parse(res.body.data), lBits);
+          return this.props.handleToPlayroom(res.body.data);
         }
       );
   },

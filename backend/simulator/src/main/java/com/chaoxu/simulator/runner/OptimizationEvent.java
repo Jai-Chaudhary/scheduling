@@ -1,11 +1,6 @@
 package com.chaoxu.simulator.runner;
 
-import java.util.List;
-
 import com.chaoxu.library.Patient;
-import com.chaoxu.library.State;
-import com.chaoxu.library.RandomBits;
-
 import com.chaoxu.simulator.optimizer.Optimizer;
 
 public class OptimizationEvent extends Event {
@@ -25,7 +20,7 @@ public class OptimizationEvent extends Event {
     public void invoke() {
         p.optimized = time;
         if (active()) {
-            String newSite = Optimizer.optimize(r.state, p, r.lBits);
+            String newSite = Optimizer.optimize(r.state, p);
             p.site = newSite;
         }
         r.patientsToOptimize.remove(p);

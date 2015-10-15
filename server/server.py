@@ -72,21 +72,6 @@ def get_sites(schedule):
             ret[x['site']].append(x['machine'])
     return ret
 
-def get_lBits(patients, num_samples):
-    return [
-        {
-            "duration": {
-                p['name']: random.random()
-                for p in patients
-            },
-            "lateness": {
-                p['name']: random.random()
-                for p in patients
-            }
-        }
-        for i in range(num_samples)
-    ]
-
 
 @app.route('/get_history_blob', methods=['POST'])
 def get_history_blob():
@@ -104,13 +89,12 @@ def get_history_blob():
         'patients': patients,
         'sites': get_sites(schedule),
         'optimization': req['optimizer']['active'],
-        'objective': req['optimizer']['objective']
+        'objective': req['optimizer']['objective'],
+        'numSamples': req['num_samples'],
+        'bitSeed': random.randint(0, 2**30)
     }
-    blob = {
-        'state': state,
-        'lBits': get_lBits(patients, req['num_samples'])
-    }
-    return flask.jsonify({'data': json.dumps(blob)})
+
+    return flask.jsonify(state)
 
 def get_patients_for_schedule(schedule):
     ret = []

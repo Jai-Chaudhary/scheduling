@@ -11,11 +11,10 @@ import com.chaoxu.library.Patient;
 import com.chaoxu.library.DiscreteDistribution;
 import com.chaoxu.library.Util;
 import com.chaoxu.library.RandomBits;
-import com.chaoxu.library.Blob;
 
 public class ConfigParser {
 
-    public static Blob parse(Config config) {
+    public static State parse(Config config) {
         RandomGenerator rng = new MersenneTwister(config.seed);
 
         List<PatientClass> patientClasses = buildPatientClasses(config.patientClasses);
@@ -30,24 +29,12 @@ public class ConfigParser {
         }
 
         state.patients = buildPatients(patientClasses, config, rng);
-
-        List<RandomBits> lBits = new ArrayList<>();
-        for (int i = 0; i < config.numSamples; i++) {
-            RandomBits bits = new RandomBits();
-            for (Patient p : state.patients) {
-                bits.duration.put(p.name, rng.nextDouble());
-                bits.lateness.put(p.name, rng.nextDouble());
-            }
-            lBits.add(bits);
-        }
-
         state.objective = config.optimizer.objective;
 
-        Blob blob = new Blob();
-        blob.state = state;
-        blob.lBits = lBits;
+        state.numSamples = config.numSamples;
+        state.bitSeed = rng.nextInt();
 
-        return blob;
+        return state;
     }
 
     private static class PatientClass {

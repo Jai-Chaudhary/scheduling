@@ -20,7 +20,6 @@ export default React.createClass({
 
     return <Sandbox
       frame={frames[id]}
-      lBits={this.props.lBits}
       handleToAnimation={() => this.setState({page: 'animation'})}
       updateFrames={this.updateFrames}
     />;

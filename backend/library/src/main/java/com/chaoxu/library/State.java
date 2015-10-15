@@ -19,13 +19,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class State {
     // current time of the simulation
     public int time;
-    // how many minutes in advance
-    // to notify patients of potential change
-    public int advanceTime;
     // list of patients
     public List<Patient> patients;
+
     // number of sites
     public Map<String, List<String>> sites;
+
     // whether optimization is enabled
     // originally I thought to add an argument
     // for runner to turn on/off optimization.
@@ -38,30 +37,29 @@ public class State {
     public boolean optimization;
     // string representation of objective
     public String objective;
+    // how many minutes in advance
+    // to notify patients of potential change
+    public int advanceTime;
+
+    public int bitSeed;
+    public int numSamples;
 
     public State() {
     }
 
     public State(State s) {
         time = s.time;
-        advanceTime = s.advanceTime;
         sites = s.sites;
-        optimization = s.optimization;
-        objective = s.objective;
-
         patients = new ArrayList<>();
         for (Patient p : s.patients) {
             patients.add(new Patient(p));
         }
-    }
 
-    public String toJSON() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (IOException e) {
-            return "error";
-        }
+        optimization = s.optimization;
+        objective = s.objective;
+        advanceTime = s.advanceTime;
+
+        bitSeed = s.bitSeed;
+        numSamples = s.numSamples;
     }
 }

@@ -2,6 +2,7 @@ package com.chaoxu.simulator.runner;
 
 import java.util.PriorityQueue;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -39,13 +40,12 @@ public class Runner {
         new HashMap<>();
 
     State state;
-    List<RandomBits> lBits;
 
     private boolean debug;
 
-    public Runner(State state, List<RandomBits> lBits, boolean debug) {
+
+    public Runner(State state, boolean debug) {
         this.state = state;
-        this.lBits = lBits;
         this.debug = debug;
 
         patientsToOptimize = new TreeSet<>(

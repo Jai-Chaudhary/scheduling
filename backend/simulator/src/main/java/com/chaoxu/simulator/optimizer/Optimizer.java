@@ -9,7 +9,6 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
-import com.chaoxu.library.RandomBits;
 import com.chaoxu.simulator.Evaluator;
 
 class Result {
@@ -23,7 +22,7 @@ public class Optimizer {
     private static final double confidenceLevel = 2.575;
 
     public static Result bestSite(State state,
-            Patient patient, List<RandomBits> lBits) {
+            Patient patient) {
         Objective objective = Objective.objFactory(state.objective);
 
         String originalSite = patient.site;
@@ -34,18 +33,21 @@ public class Optimizer {
             if (!site.equals(originalSite)) {
                 SummaryStatistics stat = new SummaryStatistics();
                 SummaryStatistics patientStat = new SummaryStatistics();
-                for (RandomBits bits : lBits) {
-                    Map<String, Double> wait = Evaluator.evaluate(state, bits);
-                    double obj = objective.value(wait);
 
-                    patient.site = site;
-                    Map<String, Double> newWait = Evaluator.evaluate(state, bits);
-                    double newObj = objective.value(newWait);
-                    patient.site = originalSite;
+                List<Map<String, Double>> waits = Evaluator.evaluate(state);
 
+                patient.site = site;
+                List<Map<String, Double>> newWaits = Evaluator.evaluate(state);
+                patient.site = originalSite;
+
+                for (int i = 0; i < waits.size(); i++) {
+                    double obj = objective.value(waits.get(i));
+                    double newObj = objective.value(newWaits.get(i));
                     stat.addValue(newObj - obj);
-                    patientStat.addValue(newWait.get(patient.name) - wait.get(patient.name));
+
+                    patientStat.addValue(newWaits.get(i).get(patient.name) - waits.get(i).get(patient.name));
                 }
+
                 objDiff.put(site, stat);
                 patientDiff.put(site, patientStat);
             }
@@ -80,9 +82,8 @@ public class Optimizer {
         return best;
     }
 
-    public static String optimize(State state, Patient patient,
-            List<RandomBits> lBits) {
-        Result result = bestSite(state, patient, lBits);
+    public static String optimize(State state, Patient patient) {
+        Result result = bestSite(state, patient);
 
         if (!result.site.equals(patient.site)) {
             SummaryStatistics stat = result.stat;

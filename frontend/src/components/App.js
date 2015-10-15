@@ -9,8 +9,8 @@ export default React.createClass({
   componentWillMount() {
     this.handleToConfig();
   },
-  handleToPlayroom(frames, lBits) {
-    let e = <Playroom handleToConfig={this.handleToConfig} frames={frames} lBits={lBits} />;
+  handleToPlayroom(frames) {
+    let e = <Playroom handleToConfig={this.handleToConfig} frames={frames} />;
     this.setState({element: e});
   },
   handleToHistory(schedule) {

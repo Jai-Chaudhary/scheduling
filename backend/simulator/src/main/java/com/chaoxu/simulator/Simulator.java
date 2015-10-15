@@ -17,9 +17,9 @@ public class Simulator {
      * whichever is earlier. Return whether stoped because
      * of stopTime.
      */
-    public static boolean simulate(State state, List<RandomBits> lBits,
+    public static boolean simulate(State state,
             Integer stopTime, boolean debug) {
-        Runner runner = new Runner(state, lBits, debug);
+        Runner runner = new Runner(state, debug);
         return runner.run(stopTime);
     }
 
@@ -29,7 +29,7 @@ public class Simulator {
      * frontend use
      */
     public static void simulateTick(State state) {
-        Runner runner = new Runner(state, null, false);
+        Runner runner = new Runner(state, false);
         Event e = runner.nextEvent();
         if (e != null) {
             state.time = e.time;
@@ -55,7 +55,7 @@ public class Simulator {
                         s.time - p.appointment);
             }
         }
-        simulate(s, null, null, false);
+        simulate(s, null, false);
 
         return s;
     }
@@ -81,7 +81,7 @@ public class Simulator {
                         bits.lateness.get(p.name));
             }
         }
-        simulate(s, null, null, false);
+        simulate(s, null, false);
 
         return s;
     }

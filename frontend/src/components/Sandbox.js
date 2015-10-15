@@ -37,9 +37,9 @@ export default React.createClass({
     let newState = this.state.newFrame.state;
     newState.patients[parseInt(this.state.patientSelect)].site = this.state.siteSelect;
     request.post('/get_animation_stats')
-    .send({state: newState, lBits: this.props.lBits}).then(
+    .send(newState).then(
       res => {
-        let data = JSON.parse(res.body.data);
+        let data = res.body;
         this.setState({
           newFrame: {
             animation: data.animation,
@@ -56,15 +56,9 @@ export default React.createClass({
     newState.optimization = this.state.optimization;
 
     request.post('/simulate_frames')
-    .send({
-      data: JSON.stringify({
-        state: newState,
-        lBits: this.props.lBits
-      }),
-      step: step
-    })
+    .send(newState)
     .then( res => {
-      let newFrames = JSON.parse(res.body.data);
+      let newFrames = res.body.data;
       this.props.updateFrames(newFrames);
     } );
   },

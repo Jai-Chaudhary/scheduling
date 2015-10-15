@@ -9,7 +9,6 @@ public class Config {
     public Horizon horizon;
     public int seed;
     public OptimizerConfig optimizer;
-    public int numSamples;
 }
 
 class PatientClassConfig {
@@ -27,6 +26,7 @@ class OptimizerConfig {
     public String objective;
     public double confidenceLevel;
     public double patientConfidenceLevel;
+    public int numSamples;
 }
 
 class Horizon {

@@ -31,7 +31,7 @@ public class ConfigParser {
         state.patients = buildPatients(patientClasses, config, rng);
         state.objective = config.optimizer.objective;
 
-        state.numSamples = config.numSamples;
+        state.numSamples = config.optimizer.numSamples;
         state.bitSeed = rng.nextInt();
 
         state.confidenceLevel = config.optimizer.confidenceLevel;

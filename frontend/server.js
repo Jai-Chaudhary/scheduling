@@ -12,7 +12,7 @@ new WebpackDevServer(webpack(config), {
   proxy: {
     '/simulate_frames': javaServer,
     '/get_animation_stats': javaServer,
-    '/parse_synthetic': pythonServer,
+    '/parse_synthetic': javaServer,
     '/parse_replay': pythonServer,
     '/parse_history': pythonServer,
   }

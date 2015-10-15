@@ -75,7 +75,7 @@ def get_replay(req):
         'sites': get_sites(schedule),
         'optimization': req['optimizer']['active'],
         'objective': req['optimizer']['objective'],
-        'numSamples': req['optimizer']['num_samples'],
+        'numSamples': req['optimizer']['numSamples'],
         'bitSeed': random.randint(0, 2**30),
         'confidenceLevel': req['optimizer']['confidenceLevel'],
         'patientConfidenceLevel': req['optimizer']['patientConfidenceLevel']

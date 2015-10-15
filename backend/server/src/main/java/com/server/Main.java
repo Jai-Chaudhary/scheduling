@@ -9,8 +9,9 @@ import spark.Spark;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import com.chaoxu.configparser.ConfigParser;
+import com.chaoxu.configparser.Config;
 import com.chaoxu.library.State;
-import com.chaoxu.library.Patient;
 import com.chaoxu.simulator.Simulator;
 import com.chaoxu.simulator.Evaluator;
 
@@ -20,6 +21,23 @@ public class Main {
     public static void main(String[] args) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        /**
+         * request is application/www-form-urlencoded encoded:
+         *  "data" field contains config string
+         * response is application/json encoded:
+         *  "data" field contains state string
+         */
+        Spark.post("/parse_synthetic", (req, res) -> {
+            // System.out.println(req.body());
+
+            Config config = mapper.readValue(req.body(), Config.class);
+            State state = ConfigParser.parse(config);
+
+            res.type("application/json");
+            res.header("Content-Encoding", "gzip");
+            return mapper.writeValueAsString(state);
+        });
 
         Spark.post("/get_animation_stats", (req, res) -> {
             State state = mapper.readValue(req.body(), State.class);

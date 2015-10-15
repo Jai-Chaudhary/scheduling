@@ -8,6 +8,6 @@
       "objective": "l2",
       "confidenceLevel": 0.7,
       "patientConfidenceLevel": 0.7,
-      "num_samples": 100
+      "numSamples": 100
   }
 }

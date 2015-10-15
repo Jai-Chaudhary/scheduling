@@ -33,8 +33,8 @@ export default React.createClass({
     }
   },
   handleGo() {
-    request.post('/configparser')
-      .send(this.state.config).then(
+    request.post('/parse_synthetic')
+      .send(JSON.parse(this.state.config)).then(
         res => {
           const state = res.body;
           return request.post('/simulate_frames')
@@ -47,7 +47,7 @@ export default React.createClass({
       );
   },
   handleReplayGo() {
-    request.post('/get_history_blob')
+    request.post('/parse_replay')
       .send(JSON.parse(this.state.replayConfig)).then(
         res => {
           const state = res.body;
@@ -61,7 +61,7 @@ export default React.createClass({
       );
   },
   handleHistoryGo() {
-    request.post('/get_history_schedule').send({day: this.state.historyDate}).then(
+    request.post('/parse_history').send({day: this.state.historyDate}).then(
       res => this.props.handleToHistory(res.body.schedule)
     );
   },

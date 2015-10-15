@@ -1,12 +1,13 @@
 {
   "day": "2013-04-15",
   "seed": 15,
-  "volunteer_prob": 0.3,
-  "num_samples": 100,
   "optimizer": {
       "active": true,
+      "advanceTime": 60,
       "volunteerProbability": 0.5,
       "objective": "l2",
-      "advanceTime": 60
+      "confidenceLevel": 0.7,
+      "patientConfidenceLevel": 0.7,
+      "num_samples": 100
   }
 }

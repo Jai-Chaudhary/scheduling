@@ -4,7 +4,6 @@ dependencies {
   compile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
   compile 'com.sparkjava:spark-core:2.2'
 
-  compile project(':configparser')
   compile project(':simulator')
 }
 

@@ -10,11 +10,11 @@ new WebpackDevServer(webpack(config), {
   hot: true,
   historyApiFallback: true,
   proxy: {
-    '/configparser': javaServer,
     '/simulate_frames': javaServer,
     '/get_animation_stats': javaServer,
-    '/get_history_blob': pythonServer,
-    '/get_history_schedule': pythonServer,
+    '/parse_synthetic': pythonServer,
+    '/parse_replay': pythonServer,
+    '/parse_history': pythonServer,
   }
 }).listen(3000, '0.0.0.0', function (err, result) {
   if (err) {

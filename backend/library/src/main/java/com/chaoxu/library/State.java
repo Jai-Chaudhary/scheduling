@@ -44,6 +44,9 @@ public class State {
     public int bitSeed;
     public int numSamples;
 
+    public double confidenceLevel;
+    public double patientConfidenceLevel;
+
     public State() {
     }
 
@@ -61,5 +64,8 @@ public class State {
 
         bitSeed = s.bitSeed;
         numSamples = s.numSamples;
+
+        confidenceLevel = s.confidenceLevel;
+        patientConfidenceLevel = s.patientConfidenceLevel;
     }
 }

@@ -16,11 +16,12 @@
     }
   ],
   "sites": {
-    "55TH": ["MR1", "MR2"],
-    "YORK": ["MR1", "MR2"]
+    "55TH": ["MR1"],
+    "YORK": ["MR1"],
+    "84TH": ["MR1"]
   },
   "horizon": {
-    "begin": 480,
+    "begin": 450,
     "end": 1200
   },
   "seed": 2,
@@ -28,7 +29,9 @@
     "active": true,
     "advanceTime": 60,
     "volunteerProbability": 0.5,
-    "objective": "l2"
+    "objective": "l1",
+    "confidenceLevel": 0.7,
+    "patientConfidenceLevel": 0.7
   },
   "numSamples": 100
 }

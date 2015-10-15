@@ -6,20 +6,19 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
 import com.chaoxu.simulator.Evaluator;
 
 class Result {
-    public SummaryStatistics stat;
-    public SummaryStatistics patientStat;
+    public NormalDistribution stat;
+    public NormalDistribution patientStat;
     public String site;
 }
 
 public class Optimizer {
-    // TODO make this a configuration
-    private static final double confidenceLevel = 2.575;
 
     public static Result bestSite(State state,
             Patient patient) {
@@ -55,27 +54,25 @@ public class Optimizer {
 
         Result best = new Result();
         best.site = patient.originalSite;
-        best.stat = new SummaryStatistics(){{
-            addValue(0);
-        }};
+        best.stat = new NormalDistribution(0,1);
 
         for (String site : objDiff.keySet()) {
             SummaryStatistics stat = objDiff.get(site);
-            double mean = stat.getMean();
-            double delta = stat.getStandardDeviation() * confidenceLevel / Math.sqrt(stat.getN());
-            if (mean + delta >= 0) continue;
+            NormalDistribution norm = new NormalDistribution(
+                    stat.getMean(), stat.getStandardDeviation());
+            if (norm.cumulativeProbability(0) < state.confidenceLevel) continue;
 
             SummaryStatistics patientStat = patientDiff.get(site);
-            // make sure the patient in question is better off
-            // TODO make this a config
-            if (patientStat.getMean() +
-                    patientStat.getStandardDeviation() * confidenceLevel
-                    / Math.sqrt(patientStat.getN()) >= 0) continue;
+            NormalDistribution patientNorm = new NormalDistribution(
+                    patientStat.getMean(), patientStat.getStandardDeviation());
 
-            if (mean < best.stat.getMean()) {
+            if (patientNorm.cumulativeProbability(0) < state.patientConfidenceLevel)
+                continue;
+
+            if (stat.getMean() < best.stat.getMean()) {
                 best.site = site;
-                best.stat = stat;
-                best.patientStat = patientStat;
+                best.stat = norm;
+                best.patientStat = patientNorm;
             }
         }
 
@@ -86,19 +83,20 @@ public class Optimizer {
         Result result = bestSite(state, patient);
 
         if (!result.site.equals(patient.site)) {
-            SummaryStatistics stat = result.stat;
+            NormalDistribution stat = result.stat;
 
+            double confidenceLevel = 1.96;
             System.out.println();
             System.out.println(String.format(
-                        "%s mean %f sd %f delta %f",
+                        "%s mean %f sd %f confidence %f",
                         patient, stat.getMean(), stat.getStandardDeviation(),
-                        stat.getStandardDeviation() * confidenceLevel / Math.sqrt(stat.getN())));
+                        stat.cumulativeProbability(0)));
 
             stat = result.patientStat;
             System.out.println(String.format(
-                        "%s mean %f sd %f delta %f",
+                        "%s mean %f sd %f confidence %f",
                         patient, stat.getMean(), stat.getStandardDeviation(),
-                        stat.getStandardDeviation() * confidenceLevel / Math.sqrt(stat.getN())));
+                        stat.cumulativeProbability(0)));
             System.out.println();
         }
 

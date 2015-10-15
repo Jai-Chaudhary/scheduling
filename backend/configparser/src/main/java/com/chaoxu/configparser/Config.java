@@ -25,6 +25,8 @@ class OptimizerConfig {
     public int advanceTime;
     public double volunteerProbability;
     public String objective;
+    public double confidenceLevel;
+    public double patientConfidenceLevel;
 }
 
 class Horizon {

@@ -34,6 +34,9 @@ public class ConfigParser {
         state.numSamples = config.numSamples;
         state.bitSeed = rng.nextInt();
 
+        state.confidenceLevel = config.optimizer.confidenceLevel;
+        state.patientConfidenceLevel = config.optimizer.patientConfidenceLevel;
+
         return state;
     }
 

@@ -3,20 +3,22 @@ package com.chaoxu.configparser;
 import java.util.List;
 import java.util.Map;
 
+import com.chaoxu.library.DiscreteDistribution;
+
 public class Config {
-    public List<PatientClassConfig> patientClasses;
+    public List<PatientClass> patientClasses;
     public Map<String, List<String>> sites;
     public Horizon horizon;
     public int seed;
     public OptimizerConfig optimizer;
 }
 
-class PatientClassConfig {
+class PatientClass {
     public String name;
     public double percent;
-    public String durationDistribution;
-    public String slotOffsetDistribution;
-    public String latenessDistribution;
+    public DiscreteDistribution durationDistribution;
+    public DiscreteDistribution slotOffsetDistribution;
+    public DiscreteDistribution latenessDistribution;
 }
 
 class OptimizerConfig {

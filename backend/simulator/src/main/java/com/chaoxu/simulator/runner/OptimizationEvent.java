@@ -20,7 +20,7 @@ public class OptimizationEvent extends Event {
     public void invoke() {
         p.optimized = time;
         if (active()) {
-            String newSite = Optimizer.optimize(r.state, p);
+            String newSite = Optimizer.optimize(r.state, p, r.debug);
             p.site = newSite;
         }
         r.patientsToOptimize.remove(p);

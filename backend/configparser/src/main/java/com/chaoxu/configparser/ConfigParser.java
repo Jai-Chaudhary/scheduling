@@ -17,8 +17,6 @@ public class ConfigParser {
     public static State parse(Config config) {
         RandomGenerator rng = new MersenneTwister(config.seed);
 
-        List<PatientClass> patientClasses = buildPatientClasses(config.patientClasses);
-
         State state = new State();
         state.time = 0;
         state.sites = config.sites;
@@ -28,7 +26,7 @@ public class ConfigParser {
             state.optimization = config.optimizer.active;
         }
 
-        state.patients = buildPatients(patientClasses, config, rng);
+        state.patients = buildPatients(config.patientClasses, config, rng);
         state.objective = config.optimizer.objective;
 
         state.numSamples = config.optimizer.numSamples;
@@ -38,33 +36,6 @@ public class ConfigParser {
         state.patientConfidenceLevel = config.optimizer.patientConfidenceLevel;
 
         return state;
-    }
-
-    private static class PatientClass {
-        double percent;
-        String name;
-        DiscreteDistribution durationDistribution;
-        DiscreteDistribution slotOffsetDistribution;
-        DiscreteDistribution latenessDistribution;
-    }
-
-    private static List<PatientClass> buildPatientClasses(List<PatientClassConfig> pcc) {
-
-        List<PatientClass> ret = new ArrayList<>();
-
-        for (PatientClassConfig pcConfig : pcc) {
-            PatientClass pc = new PatientClass();
-            pc.percent = pcConfig.percent;
-            pc.name = pcConfig.name;
-            // TODO increase efficiency of parse distribution
-            pc.durationDistribution = DiscreteDistribution.parse(pcConfig.durationDistribution);
-            pc.slotOffsetDistribution = DiscreteDistribution.parse(pcConfig.slotOffsetDistribution);
-            pc.latenessDistribution = DiscreteDistribution.parse(pcConfig.latenessDistribution);
-
-            ret.add(pc);
-        }
-
-        return ret;
     }
 
     private static List<Patient> buildPatients(

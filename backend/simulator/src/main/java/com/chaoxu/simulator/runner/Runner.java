@@ -41,8 +41,7 @@ public class Runner {
 
     State state;
 
-    private boolean debug;
-
+    public boolean debug;
 
     public Runner(State state, boolean debug) {
         this.state = state;
@@ -84,6 +83,7 @@ public class Runner {
         for (Patient p : state.patients) {
             switch(p.status()) {
                 case ToOptimize:
+                    // in case patient will arrive before we optimize
                     if (p.lateness <= -state.advanceTime) {
                         p.optimized = p.appointment + p.lateness;
                         patientsToArrive.add(p);

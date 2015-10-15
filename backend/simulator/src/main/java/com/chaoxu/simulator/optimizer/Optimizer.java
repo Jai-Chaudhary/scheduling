@@ -79,10 +79,11 @@ public class Optimizer {
         return best;
     }
 
-    public static String optimize(State state, Patient patient) {
+    public static String optimize(State state, Patient patient,
+            boolean debug) {
         Result result = bestSite(state, patient);
 
-        if (!result.site.equals(patient.site)) {
+        if (debug && !result.site.equals(patient.site)) {
             NormalDistribution stat = result.stat;
 
             double confidenceLevel = 1.96;
@@ -100,29 +101,6 @@ public class Optimizer {
             System.out.println();
         }
 
-        /*
-        for (Patient p : state.patients)
-            if (p.volunteer && p.status() == Patient.PatientStatus.ToOptimize) {
-                Result r = bestSite(state, p, lBits);
-                SummaryStatistics stat = r.stat;
-                if (r.site != p.site) {
-                    System.out.println(String.format(
-                                "%s mean %f sd %f delta %f",
-                                p, stat.getMean(), stat.getStandardDeviation(),
-                                stat.getStandardDeviation() * confidenceLevel / Math.sqrt(stat.getN())));
-                }
-            }
-            */
-
         return result.site;
-    }
-
-    private static double getAvgWait(Map<String, Double> waitStat) {
-        double ret = 0;
-        for (String name : waitStat.keySet()) {
-            ret += waitStat.get(name);
-        }
-        ret /= waitStat.size();
-        return ret;
     }
 }

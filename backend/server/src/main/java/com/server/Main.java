@@ -29,8 +29,6 @@ public class Main {
          *  "data" field contains state string
          */
         Spark.post("/parse_synthetic", (req, res) -> {
-            // System.out.println(req.body());
-
             Config config = mapper.readValue(req.body(), Config.class);
             State state = ConfigParser.parse(config);
 

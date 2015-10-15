@@ -5,11 +5,12 @@ import {step} from '../lib/constant';
 
 let config = null;
 let replayConfig = null;
+let historyDate = '2013-04-15';
 
 export default React.createClass({
   mixins: [React.addons.LinkedStateMixin],
   getInitialState() {
-    let state = { config: 'Loading', replayConfig: 'Loading'};
+    let state = { config: 'Loading', replayConfig: 'Loading', historyDate: historyDate};
     if (config != null) {
       state.config = config;
     }
@@ -61,23 +62,36 @@ export default React.createClass({
         }
       );
   },
+  handleHistoryGo() {
+    request.post('/get_history_schedule').send({day: this.state.historyDate}).then(
+      res => this.props.handleToHistory(res.body.schedule)
+    );
+  },
   componentWillUnmount() {
     config = this.state.config;
     replayConfig = this.state.replayConfig;
+    historyDate = this.state.historyDate;
   },
   render() {
     return (
       <div>
         <h1>Config</h1>
+
         <div>
           <button onClick={this.handleGo}>Go</button>
           <br />
           <textarea valueLink={this.linkState('config')} style={{width:'600px',height:'500px'}}></textarea>
         </div>
+
         <div>
           <button onClick={this.handleReplayGo}>Go</button>
           <br />
           <textarea valueLink={this.linkState('replayConfig')} style={{width:'600px',height:'500px'}}></textarea>
+        </div>
+
+        <div>
+          <input type="text" valueLink={this.linkState('historyDate')} />
+          <button onClick={this.handleHistoryGo}>Go</button>
         </div>
       </div>
     );

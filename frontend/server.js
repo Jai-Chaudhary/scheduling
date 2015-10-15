@@ -13,7 +13,8 @@ new WebpackDevServer(webpack(config), {
     '/configparser': javaServer,
     '/simulate_frames': javaServer,
     '/get_animation_stats': javaServer,
-    '/get_history_blob': pythonServer
+    '/get_history_blob': pythonServer,
+    '/get_history_schedule': pythonServer,
   }
 }).listen(3000, '0.0.0.0', function (err, result) {
   if (err) {

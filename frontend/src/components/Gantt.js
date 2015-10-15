@@ -11,7 +11,7 @@ const padding = {
   top: 20,
   right: 40,
   bottom: 35,
-  left: 120
+  left: 180
 };
 const rx = 5;
 const strokeWidth = 3;

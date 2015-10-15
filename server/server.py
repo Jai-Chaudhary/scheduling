@@ -112,6 +112,31 @@ def get_history_blob():
     }
     return flask.jsonify({'data': json.dumps(blob)})
 
-#TODO use config instead of hacks
+def get_patients_for_schedule(schedule):
+    ret = []
+    for x in schedule:
+        p = {
+            'name': x['mrn'],
+            'clazz': '{}_{}'.format(x['service'], x['slot']),
+            'appointment': get_mins(x['appointment_time']),
+
+            'site': x['site'],
+            'machine': x['machine'],
+            'arrival': get_mins(x['arrival_time']),
+            'begin': get_mins(x['begin_time']),
+            'completion': get_mins(x['completion_time']),
+
+            'slot': x['slot']
+        }
+        ret.append(p)
+    return ret
+
+@app.route('/get_history_schedule', methods=['POST'])
+def get_history_schedule():
+    req = flask.request.get_json()
+    day = req['day']
+    schedule = list(coll.find({'day': day}))
+    schedule = get_patients_for_schedule(schedule)
+    return flask.jsonify({'schedule': schedule})
 
 app.run(host='0.0.0.0')

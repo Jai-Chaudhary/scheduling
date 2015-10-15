@@ -12,7 +12,7 @@ export function toTime(x) {
   return moment({m: x}).toDate();
 }
 
-function shortTime(x) {
+export function shortTime(x) {
   return moment({h:Math.floor(x/60), m:x%60}).format('HH:mm');
 }
 

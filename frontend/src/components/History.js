@@ -8,7 +8,7 @@ export default React.createClass({
   render() {
     function tipCb(d) {
       return `
-      ${d.name} class ${d.clazz} <br/>
+      ${d.name} wait ${d.wait}<br/>
       appointment ${shortTime(d.appointment)} <br/>
       arrival ${shortTime(d.arrival)} <br/>
       begin ${shortTime(d.begin)} <br/>
@@ -19,6 +19,7 @@ export default React.createClass({
 
     const nameScale = d3.scale.category10();
     const waitScale = d3.scale.linear().domain([0, 90]).range(["green", "red"]);
+    this.props.schedule.forEach(d => d.wait = Math.max(0, d.begin - Math.max(d.arrival, d.appointment)));
 
     return (
       <div style={{marginTop: 90}}>
@@ -30,7 +31,7 @@ export default React.createClass({
           row={d => d.site + " " + d.machine}
           xlim={[toTime(360), toTime(1380)]}
           stroke={d => waitScale(d.arrival - d.appointment)}
-          color={d => waitScale(d.begin - Math.max(d.arrival, d.appointment))}
+          color={d => waitScale(d.wait)}
           tip={tipCb}
         />
       </div>

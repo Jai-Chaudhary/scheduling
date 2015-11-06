@@ -8,7 +8,7 @@ const rowHeight = 30;
 const bandHeight = 20;
 const width = '100%';
 const padding = {
-  top: 20,
+  top: 90,
   right: 40,
   bottom: 35,
   left: 180

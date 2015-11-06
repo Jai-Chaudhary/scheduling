@@ -56,10 +56,19 @@ public class ConfigParser {
                     int pIndex = pcDist.sample(rng.nextDouble());
                     PatientClass pc = patientClasses.get(pIndex);
 
+                    int slot;
+                    if (pc.slot != null) {
+                        slot = pc.slot;
+                    } else {
+                        slot = pc.slotOffsetDistribution.sample(rng.nextDouble()) +
+                            (int)pc.durationDistribution.expectation();
+                    }
+
                     Patient p = new Patient();
                     p.name = String.format("P%s-%s-%s", s, m, Util.toTime(curTime));
                     p.clazz = pc.name;
                     p.appointment = curTime;
+                    p.slot = slot;
                     p.originalSite = s;
                     p.site = s;
                     p.durationDistribution = pc.durationDistribution;
@@ -78,8 +87,7 @@ public class ConfigParser {
                     ret.add(p);
 
                     // notice double is implicitly converted to int with += operator
-                    curTime += pc.durationDistribution.expectation()
-                        + pc.slotOffsetDistribution.sample(rng.nextDouble());
+                    curTime += slot;
                 }
             }
         }

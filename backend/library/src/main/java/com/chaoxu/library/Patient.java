@@ -5,6 +5,7 @@ public class Patient {
     public String name;
     public String clazz;
     public int appointment;
+    public int slot;
     public String originalSite;
     public DiscreteDistribution durationDistribution;
     public DiscreteDistribution latenessDistribution;
@@ -15,6 +16,9 @@ public class Patient {
     public Integer arrival;
     public Integer begin;
     public Integer completion;
+
+    public Double originalWait;
+    public Double divertedWait;
 
     // status related to optimizer
     public Integer optimized;   // time this patient is optimized
@@ -31,6 +35,7 @@ public class Patient {
         name = p.name;
         clazz = p.clazz;
         appointment = p.appointment;
+        slot = p.slot;
         originalSite = p.originalSite;
         durationDistribution = p.durationDistribution;
         latenessDistribution = p.latenessDistribution;
@@ -46,6 +51,9 @@ public class Patient {
 
         duration = p.duration;
         lateness = p.lateness;
+
+        originalWait = p.originalWait;
+        divertedWait = p.divertedWait;
     }
 
     @Override

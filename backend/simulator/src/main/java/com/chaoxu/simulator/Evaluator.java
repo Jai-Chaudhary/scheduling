@@ -36,7 +36,8 @@ public class Evaluator {
 
         State newState = Simulator.simulateWithSampling(state, bits);
         for (Patient p : newState.patients) {
-            waitingTime.put(p.name, (double)(p.begin - p.arrival));
+            waitingTime.put(p.name, (double)(
+                        Math.max(p.begin - Math.max(p.arrival, p.appointment),0)));
         }
 
         return waitingTime;

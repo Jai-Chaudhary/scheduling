@@ -6,16 +6,33 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.distribution.NormalDistribution;
 
 import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
 import com.chaoxu.simulator.Evaluator;
 
 class Result {
-    public NormalDistribution stat;
-    public NormalDistribution patientStat;
+    public Statistics stat;
+    public Statistics patientStat;
     public String site;
+}
+
+class Statistics {
+    private List<Double> values = new ArrayList<>();
+    public SummaryStatistics stat = new SummaryStatistics();
+
+    public void add(double v) {
+        values.add(v);
+        stat.addValue(v);
+    }
+
+    public double ecdf(double x) {
+        int c = 0;
+        for (double v : values)
+            if (v <= x)
+                c++;
+        return (double) c / values.size();
+    }
 }
 
 public class Optimizer {
@@ -25,13 +42,15 @@ public class Optimizer {
         Objective objective = Objective.objFactory(state.objective);
 
         String originalSite = patient.site;
-        Map<String, SummaryStatistics> objDiff = new HashMap<>();
-        Map<String, SummaryStatistics> patientDiff = new HashMap<>();
+        Map<String, Statistics> objDiff = new HashMap<>();
+        Map<String, Statistics> patientDiff = new HashMap<>();
+
+        double originalWait = 0;
 
         for (String site : state.sites.keySet()) {
             if (!site.equals(originalSite)) {
-                SummaryStatistics stat = new SummaryStatistics();
-                SummaryStatistics patientStat = new SummaryStatistics();
+                Statistics stat = new Statistics();
+                Statistics patientStat = new Statistics();
 
                 List<Map<String, Double>> waits = Evaluator.evaluate(state);
 
@@ -39,13 +58,16 @@ public class Optimizer {
                 List<Map<String, Double>> newWaits = Evaluator.evaluate(state);
                 patient.site = originalSite;
 
+                originalWait = 0;
+
                 for (int i = 0; i < waits.size(); i++) {
                     double obj = objective.value(waits.get(i));
                     double newObj = objective.value(newWaits.get(i));
-                    stat.addValue(newObj - obj);
-
-                    patientStat.addValue(newWaits.get(i).get(patient.name) - waits.get(i).get(patient.name));
+                    stat.add(newObj - obj);
+                    patientStat.add(newWaits.get(i).get(patient.name) - waits.get(i).get(patient.name));
+                    originalWait += waits.get(i).get(patient.name);
                 }
+                originalWait /= waits.size();
 
                 objDiff.put(site, stat);
                 patientDiff.put(site, patientStat);
@@ -54,26 +76,28 @@ public class Optimizer {
 
         Result best = new Result();
         best.site = patient.originalSite;
-        best.stat = new NormalDistribution(0,1);
+        best.stat = new Statistics();
+        best.stat.add(0);
 
         for (String site : objDiff.keySet()) {
-            SummaryStatistics stat = objDiff.get(site);
-            NormalDistribution norm = new NormalDistribution(
-                    stat.getMean(), stat.getStandardDeviation());
-            if (norm.cumulativeProbability(0) < state.confidenceLevel) continue;
+            Statistics stat = objDiff.get(site);
+            if (stat.ecdf(0) < state.confidenceLevel) continue;
 
-            SummaryStatistics patientStat = patientDiff.get(site);
-            NormalDistribution patientNorm = new NormalDistribution(
-                    patientStat.getMean(), patientStat.getStandardDeviation());
+            Statistics patientStat = patientDiff.get(site);
 
-            if (patientNorm.cumulativeProbability(0) < state.patientConfidenceLevel)
+            if (patientStat.ecdf(0) < state.patientConfidenceLevel)
                 continue;
 
-            if (stat.getMean() < best.stat.getMean()) {
+            if (stat.stat.getMean() < best.stat.stat.getMean()) {
                 best.site = site;
-                best.stat = norm;
-                best.patientStat = patientNorm;
+                best.stat = stat;
+                best.patientStat = patientStat;
             }
+        }
+
+        if (!best.site.equals(patient.site)) {
+            patient.originalWait = originalWait;
+            patient.divertedWait = originalWait + best.patientStat.stat.getMean();
         }
 
         return best;
@@ -84,20 +108,20 @@ public class Optimizer {
         Result result = bestSite(state, patient);
 
         if (debug && !result.site.equals(patient.site)) {
-            NormalDistribution stat = result.stat;
+            Statistics stat = result.stat;
 
             double confidenceLevel = 1.96;
             System.out.println();
             System.out.println(String.format(
                         "%s mean %f sd %f confidence %f",
-                        patient, stat.getMean(), stat.getStandardDeviation(),
-                        stat.cumulativeProbability(0)));
+                        patient, stat.stat.getMean(), stat.stat.getStandardDeviation(),
+                        stat.ecdf(0)));
 
             stat = result.patientStat;
             System.out.println(String.format(
                         "%s mean %f sd %f confidence %f",
-                        patient, stat.getMean(), stat.getStandardDeviation(),
-                        stat.cumulativeProbability(0)));
+                        patient, stat.stat.getMean(), stat.stat.getStandardDeviation(),
+                        stat.ecdf(0)));
             System.out.println();
         }
 

@@ -21,22 +21,16 @@ export function ganttHelper(state, animation, stats) {
     let ret = '';
     if (p.volunteer) ret += 'v';
     if (p.arrival < state.time && p.begin > state.time) ret += 'w';
+    if (p.originalSite != p.site) ret += 'M';
       return ret;
   }
 
-  function strokeCb(p) {
-    // we need to invoke nameScale for each patient
-    // to make sure its domain is correct
-    let ret = nameScale(p.name);
-    if (p.originalSite != p.site) return 'black';
-    return ret;
-  }
-
   function tipCb(d) {
+    const w = Math.round(stats[d.name] * 100) / 100;
     let ret = `
-      ${d.name} wait ${stats[d.name]} <br/>
-      class ${d.clazz} <br/>
+      ${d.name} wait ${w} <br/>
       appointment ${shortTime(d.appointment)} <br/>
+      slot ${d.slot} <br/>
       `;
     if (d.arrival < state.time) ret += `arrival ${shortTime(d.arrival)} <br/>`;
     if (d.begin < state.time) ret += `begin ${shortTime(d.begin)} machine ${d.machine} <br/>`;
@@ -56,7 +50,7 @@ export function ganttHelper(state, animation, stats) {
     row={d => d.site + " " + d.machine}
     xlim={[toTime(360), toTime(1380)]}
     time={toTime(state.time)}
-    stroke={strokeCb}
+    stroke={d => nameScale(d.name)}
     tip={tipCb}
     color={d => waitScale(stats[d.name])}
     text={textCb}

@@ -17,8 +17,9 @@ class PatientClass {
     public String name;
     public double percent;
     public DiscreteDistribution durationDistribution;
-    public DiscreteDistribution slotOffsetDistribution;
     public DiscreteDistribution latenessDistribution;
+    public DiscreteDistribution slotOffsetDistribution;
+    public Integer slot;
 }
 
 class OptimizerConfig {

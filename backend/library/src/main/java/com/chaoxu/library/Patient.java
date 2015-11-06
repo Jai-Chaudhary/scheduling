@@ -6,54 +6,40 @@ public class Patient {
     public String clazz;
     public int appointment;
     public int slot;
-    public String originalSite;
     public DiscreteDistribution durationDistribution;
     public DiscreteDistribution latenessDistribution;
+    public boolean volunteer;
+    public int seed;
 
     // status, available to optimizer
     public String site;
     public String machine;
-    public Integer arrival;
-    public Integer begin;
-    public Integer completion;
+    public Status status;
+    public boolean optimized;
 
-    public Double originalWait;
-    public Double divertedWait;
+    public Stat stat;
+    public Secret secret;
 
-    // status related to optimizer
-    public Integer optimized;   // time this patient is optimized
-    public boolean volunteer;
+    public Patient copy() {
+        Patient p = new Patient();
 
-    // not available to optimizer
-    public int duration;
-    public int lateness;
+        p.name = name;
+        p.clazz = clazz;
+        p.appointment = appointment;
+        p.slot = slot;
+        p.durationDistribution = durationDistribution;
+        p.latenessDistribution = latenessDistribution;
+        p.volunteer = volunteer;
+        p.seed = seed;
 
-    public Patient() {
-    }
+        p.site = site;
+        p.machine = machine;
+        p.status = status;
+        p.optimized = optimized;
 
-    public Patient(Patient p) {
-        name = p.name;
-        clazz = p.clazz;
-        appointment = p.appointment;
-        slot = p.slot;
-        originalSite = p.originalSite;
-        durationDistribution = p.durationDistribution;
-        latenessDistribution = p.latenessDistribution;
+        p.stat = stat.copy();
 
-        site = p.site;
-        machine = p.machine;
-        arrival = p.arrival;
-        begin = p.begin;
-        completion = p.completion;
-
-        optimized = p.optimized;
-        volunteer = p.volunteer;
-
-        duration = p.duration;
-        lateness = p.lateness;
-
-        originalWait = p.originalWait;
-        divertedWait = p.divertedWait;
+        return p;
     }
 
     @Override
@@ -61,19 +47,49 @@ public class Patient {
         return name;
     }
 
-    public PatientStatus status() {
-        if (completion != null) return PatientStatus.Done;
-        if (begin != null) return PatientStatus.ToComplete;
-        if (arrival != null) return PatientStatus.ToBegin;
-        if (optimized != null) return PatientStatus.ToArrive;
-        return PatientStatus.ToOptimize;
+    public enum Status {
+        Init,
+        Scheduled,
+        Canceled,
+        Arrived,
+        InProgress,
+        Completed
     }
 
-    public enum PatientStatus {
-        ToOptimize,
-        ToArrive,
-        ToBegin,
-        ToComplete,
-        Done
+    public class Stat {
+        public Integer schedule;
+        public Integer arrival;
+        public Integer begin;
+        public Integer completion;
+        public Integer cancel;
+
+        public Double originalWait;
+        public Double divertedWait;
+
+        public String originalSite;
+
+        public Stat copy() {
+            Stat s = new Stat();
+
+            s.schedule = schedule;
+            s.arrival = arrival;
+            s.begin = begin;
+            s.completion = completion;
+            s.cancel = cancel;
+
+            s.originalWait = originalWait;
+            s.divertedWait = divertedWait;
+
+            s.originalSite = originalSite;
+
+            return s;
+        }
+    }
+
+    public class Secret {
+        public Integer schedule;
+        public Integer duration;
+        public Integer lateness;
+        public Integer cancel;
     }
 }

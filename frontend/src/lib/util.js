@@ -16,11 +16,11 @@ export function shortTime(x) {
   return moment({h:Math.floor(x/60), m:x%60}).format('HH:mm');
 }
 
-export function ganttHelper(state, animation, stats) {
+export function ganttHelper(time, animation, stats) {
   function textCb(p) {
     let ret = '';
     if (p.volunteer) ret += 'v';
-    if (p.arrival < state.time && p.begin > state.time) ret += 'w';
+    if (p.arrival < time && p.begin > time) ret += 'w';
     if (p.originalSite != p.site) ret += 'M';
       return ret;
   }
@@ -32,9 +32,9 @@ export function ganttHelper(state, animation, stats) {
       appointment ${shortTime(d.appointment)} <br/>
       slot ${d.slot} <br/>
       `;
-    if (d.arrival < state.time) ret += `arrival ${shortTime(d.arrival)} <br/>`;
-    if (d.begin < state.time) ret += `begin ${shortTime(d.begin)} machine ${d.machine} <br/>`;
-    if (d.completion < state.time) ret += `completion ${shortTime(d.completion)} <br/>`;
+    if (d.arrival < time) ret += `arrival ${shortTime(d.arrival)} <br/>`;
+    if (d.begin < time) ret += `begin ${shortTime(d.begin)} machine ${d.machine} <br/>`;
+    if (d.completion < time) ret += `completion ${shortTime(d.completion)} <br/>`;
     return ret;
   }
 
@@ -44,12 +44,12 @@ export function ganttHelper(state, animation, stats) {
 
 
   return <Gantt
-    data={animation.patients}
+    data={animation}
     begin={d => toTime(d.begin)}
     end={d => toTime(d.completion)}
     row={d => d.site + " " + d.machine}
     xlim={[toTime(360), toTime(1380)]}
-    time={toTime(state.time)}
+    time={toTime(time)}
     stroke={d => nameScale(d.name)}
     tip={tipCb}
     color={d => waitScale(stats[d.name])}

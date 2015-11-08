@@ -1,20 +1,5 @@
 {
-  "patientClasses": [
-    {
-      "name": "long",
-      "percent": 0.5,
-      "durationDistribution": "lognorm(4.1, 0.3, 30, 90)",
-      "slotOffsetDistribution": "uniform(-20, 20)",
-      "latenessDistribution": "uniform(-5,10)"
-    },
-    {
-      "name": "short",
-      "percent": 0.5,
-      "durationDistribution": "lognorm(3.4, 0.4, 15, 45)",
-      "slotOffsetDistribution": "uniform(-10, 10)",
-      "latenessDistribution": "uniform(-1,1)"
-    }
-  ],
+  "seed": 2,
   "sites": {
     "55TH": ["MR1"],
     "YORK": ["MR1"],
@@ -24,14 +9,33 @@
     "begin": 450,
     "end": 1200
   },
-  "seed": 2,
   "optimizer": {
     "active": true,
     "advanceTime": 60,
-    "volunteerProbability": 0.5,
     "objective": "l1",
     "confidenceLevel": 0.7,
     "patientConfidenceLevel": 0.7,
     "numSamples": 100
+  },
+  "patient": {
+    "volunteerProbability": 0.5,
+    "cancelProbability": 0.02,
+    "SDAOPRate": 2,
+    "classes": [
+      {
+        "name": "long",
+        "percent": 0.5,
+        "durationDistribution": "lognorm(4.1, 0.3, 30, 90)",
+        "slotOffsetDistribution": "uniform(-20, 20)",
+        "latenessDistribution": "uniform(-5,10)"
+      },
+      {
+        "name": "short",
+        "percent": 0.5,
+        "durationDistribution": "lognorm(3.4, 0.4, 15, 45)",
+        "slotOffsetDistribution": "uniform(-10, 10)",
+        "latenessDistribution": "uniform(-1,1)"
+      }
+    ]
   }
 }

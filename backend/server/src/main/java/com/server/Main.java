@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.chaoxu.configparser.ConfigParser;
 import com.chaoxu.configparser.Config;
 import com.chaoxu.library.State;
+import com.chaoxu.library.Patient;
+import com.chaoxu.library.PatientStat;
 import com.chaoxu.simulator.Simulator;
 import com.chaoxu.simulator.Evaluator;
 
@@ -37,6 +39,7 @@ public class Main {
             return mapper.writeValueAsString(state);
         });
 
+        /*
         Spark.post("/get_animation_stats", (req, res) -> {
             State state = mapper.readValue(req.body(), State.class);
 
@@ -48,6 +51,7 @@ public class Main {
             res.type("application/json");
             return mapper.writeValueAsString(data);
         });
+        */
 
         Spark.post("/simulate", (req, res) -> {
             State state = mapper.readValue(req.body(), State.class);
@@ -55,7 +59,8 @@ public class Main {
             Simulator.simulate(state, null, true);
             res.type("application/json");
             res.header("Content-Encoding", "gzip");
-            return mapper.writeValueAsString(state);
+
+            return mapper.writeValueAsString(getStat(state));
         });
 
         /**
@@ -72,34 +77,39 @@ public class Main {
          */
         Spark.post("/simulate_frames", (req, res) -> {
             State state = mapper.readValue(req.body(), State.class);
+            Simulator.simulate(state, 1, true);
             Simulator.simulateTick(state);
 
             List<Map<String, Object>> frames = new ArrayList<>();
-            frames.add(new HashMap<String, Object>() {{
-                put("state", new State(state));
-                put("animation", Simulator.simulateWithExpectation(state));
-                put("stats", Evaluator.perPatientMean(state));
-            }});
-
+            frames.add(getFrame(state));
             while (true) {
                 boolean reachStopTime = Simulator.simulate(state,
                         state.time + step, true);
-                frames.add(new HashMap<String, Object>() {{
-                    put("state", new State(state));
-                    put("animation", Simulator.simulateWithExpectation(state));
-                    put("stats", Evaluator.perPatientMean(state));
-                }});
+                frames.add(getFrame(state));
                 if (!reachStopTime) {
                     break;
                 }
             }
 
-            Map<String, Object> ret = new HashMap<>();
-            ret.put("data", frames);
             res.type("application/json");
             // compress response so the transfering is lighting fast
             res.header("Content-Encoding", "gzip");
-            return mapper.writeValueAsString(ret);
+            return mapper.writeValueAsString(frames);
         });
+    }
+
+    private static List<PatientStat> getStat(State state) {
+        List<PatientStat> ret = new ArrayList<>();
+        for (Patient p : state.patients)
+            ret.add(new PatientStat(p));
+        return ret;
+    }
+
+    private static Map<String, Object> getFrame(State state) {
+        Map<String, Object> ret = new HashMap<>();
+        ret.put("time", state.time);
+        ret.put("animation", getStat(Simulator.simulateWithMedian(state)));
+        ret.put("stats", Evaluator.perPatientMean(state));
+        return ret;
     }
 }

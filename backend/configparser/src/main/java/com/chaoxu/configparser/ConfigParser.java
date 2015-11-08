@@ -5,12 +5,62 @@ import java.util.ArrayList;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.distribution.PoissonDistribution;
 
 import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
 import com.chaoxu.library.DiscreteDistribution;
 import com.chaoxu.library.Util;
 import com.chaoxu.library.RandomBits;
+
+class PatientGenerator {
+    private DiscreteDistribution pcDist;
+    private List<PatientClass> patientClasses;
+    private RandomGenerator rng;
+
+    public PatientGenerator(List<PatientClass> patientClasses,
+            RandomGenerator rng) {
+        List<Double> percent = new ArrayList<>();
+        for (PatientClass pc : patientClasses) percent.add(pc.percent);
+        pcDist = new DiscreteDistribution(0, percent);
+
+        this.patientClasses = patientClasses;
+        this.rng = rng;
+    }
+
+    // missing name, appointment, volunteer, cancel secret, schedule secret
+    public Patient nextPatient(String site) {
+        int pIndex = pcDist.sample(rng.nextDouble());
+        PatientClass pc = patientClasses.get(pIndex);
+
+        Patient p = new Patient();
+        p.clazz = pc.name;
+
+        int slot;
+        if (pc.slot != null) {
+            slot = pc.slot;
+        } else {
+            slot = pc.slotOffsetDistribution.sample(rng.nextDouble()) +
+                (int)pc.durationDistribution.expectation();
+        }
+        p.slot = slot;
+
+        p.durationDistribution = pc.durationDistribution;
+        p.latenessDistribution = pc.latenessDistribution;
+        p.seed = rng.nextInt();
+
+        p.site = site;
+        p.status = Patient.Status.Init;
+        p.optimized = false;
+
+        p.stat.originalSite = site;
+
+        p.secret.duration = pc.durationDistribution.sample(rng.nextDouble());
+        p.secret.lateness = pc.latenessDistribution.sample(rng.nextDouble());
+
+        return p;
+    }
+}
 
 public class ConfigParser {
 
@@ -20,74 +70,62 @@ public class ConfigParser {
         State state = new State();
         state.time = 0;
         state.sites = config.sites;
+        state.optimizer = config.optimizer;
 
-        if (config.optimizer != null) {
-            state.advanceTime = config.optimizer.advanceTime;
-            state.optimization = config.optimizer.active;
-        }
-
-        state.patients = buildPatients(config.patientClasses, config, rng);
-        state.objective = config.optimizer.objective;
-
-        state.numSamples = config.optimizer.numSamples;
-        state.bitSeed = rng.nextInt();
-
-        state.confidenceLevel = config.optimizer.confidenceLevel;
-        state.patientConfidenceLevel = config.optimizer.patientConfidenceLevel;
-
+        state.patients = buildPatients(config, rng);
         return state;
     }
 
     private static List<Patient> buildPatients(
-            List<PatientClass> patientClasses, Config config,
+            Config config,
             RandomGenerator rng) {
-
-        List<Double> percent = new ArrayList<>();
-        for (PatientClass pc : patientClasses) percent.add(pc.percent);
-
-        DiscreteDistribution pcDist = new DiscreteDistribution(0, percent);
+        PatientGenerator pg = new PatientGenerator(config.patient.classes, rng);
 
         List<Patient> ret = new ArrayList<>();
 
+        // generate regular patients
         for (String s : config.sites.keySet()) {
             for (String m : config.sites.get(s)) {
                 int curTime = config.horizon.begin;
                 while (curTime < config.horizon.end) {
-                    int pIndex = pcDist.sample(rng.nextDouble());
-                    PatientClass pc = patientClasses.get(pIndex);
-
-                    int slot;
-                    if (pc.slot != null) {
-                        slot = pc.slot;
-                    } else {
-                        slot = pc.slotOffsetDistribution.sample(rng.nextDouble()) +
-                            (int)pc.durationDistribution.expectation();
-                    }
-
-                    Patient p = new Patient();
+                    Patient p = pg.nextPatient(s);
                     p.name = String.format("P%s-%s-%s", s, m, Util.toTime(curTime));
-                    p.clazz = pc.name;
                     p.appointment = curTime;
-                    p.slot = slot;
-                    p.originalSite = s;
-                    p.site = s;
-                    p.durationDistribution = pc.durationDistribution;
-                    p.latenessDistribution = pc.latenessDistribution;
-
-                    p.duration = pc.durationDistribution.sample(rng.nextDouble());
-                    p.lateness = pc.latenessDistribution.sample(rng.nextDouble());
-
-                    p.volunteer = false;
-
-                    if (config.optimizer != null &&
-                            rng.nextDouble() < config.optimizer.volunteerProbability) {
-                        // patient volunteer
+                    if (rng.nextDouble() < config.patient.volunteerProbability) {
                         p.volunteer = true;
-                            }
+                    }
+                    if (rng.nextDouble() < config.patient.cancelProbability) {
+                        // TODO magic cancel offset number
+                        p.secret.cancel = p.appointment - 120;
+                    }
+                    p.secret.schedule = 0;
                     ret.add(p);
 
-                    // notice double is implicitly converted to int with += operator
-                    curTime += slot;
+                    curTime += p.slot;
+                }
+            }
+        }
+
+        // generate SDAOP
+        PoissonDistribution pd = new PoissonDistribution(rng,
+                config.patient.SDAOPRate,
+                PoissonDistribution.DEFAULT_EPSILON,
+                PoissonDistribution.DEFAULT_MAX_ITERATIONS);
+        for (String s : config.sites.keySet()) {
+            for (String m : config.sites.get(s)) {
+                int num = pd.sample();
+
+                for (int i = 0; i < num; i++) {
+                    Patient p = pg.nextPatient(s);
+                    p.name = String.format("SDAOP%s-%s-%d", s, m, i);
+                    p.appointment = (int)(rng.nextDouble()
+                        * (config.horizon.end - config.horizon.begin)
+                        + config.horizon.begin);
+                    p.volunteer = false;
+                    p.secret.schedule = null;
+                    p.secret.lateness = 0;
+                    p.secret.cancel = null;
+                    ret.add(p);
                 }
             }
         }

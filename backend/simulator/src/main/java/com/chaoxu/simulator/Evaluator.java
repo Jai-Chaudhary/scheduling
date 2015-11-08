@@ -15,16 +15,18 @@ import com.chaoxu.library.RandomBits;
 
 public class Evaluator {
     static private List<RandomBits> generatelBits(State state) {
-        RandomGenerator rng = new MersenneTwister(state.bitSeed);
 
         List<RandomBits> lBits = new ArrayList<>();
-        for (int i = 0; i < state.numSamples; i++) {
-            RandomBits bits = new RandomBits();
-            for (Patient p : state.patients) {
-                bits.duration.put(p.name, rng.nextDouble());
-                bits.lateness.put(p.name, rng.nextDouble());
+        for (int i = 0; i < state.optimizer.numSamples; i++) {
+            lBits.add(new RandomBits());
+        }
+
+        for (Patient p : state.patients) {
+            RandomGenerator rng = new MersenneTwister(p.seed);
+            for (int i = 0; i < state.optimizer.numSamples; i++) {
+                lBits.get(i).duration.put(p.name, rng.nextDouble());
+                lBits.get(i).lateness.put(p.name, rng.nextDouble());
             }
-            lBits.add(bits);
         }
 
         return lBits;
@@ -37,31 +39,32 @@ public class Evaluator {
         State newState = Simulator.simulateWithSampling(state, bits);
         for (Patient p : newState.patients) {
             waitingTime.put(p.name, (double)(
-                        Math.max(p.begin - Math.max(p.arrival, p.appointment),0)));
+                        Math.max(p.stat.begin - Math.max(p.stat.arrival, p.appointment),0)));
         }
 
         return waitingTime;
     }
 
+    // NEVER evaluate the original state, always do it on a copy
     public static List<Map<String, Double>> evaluate(State state) {
+        State s = state.copy();
         List<Map<String, Double>> ret = new ArrayList<>();
-        List<RandomBits> lBits = generatelBits(state);
+        List<RandomBits> lBits = generatelBits(s);
         for (RandomBits bit : lBits) {
-            ret.add(evaluateOne(state, bit));
+            ret.add(evaluateOne(s, bit));
         }
         return ret;
     }
 
     public static Map<String, Double> perPatientMean(State state) {
-
         Map<String, SummaryStatistics> stat = new HashMap<>();
-        for (Patient p : state.patients) {
-            stat.put(p.name, new SummaryStatistics());
-        }
 
         List<Map<String, Double>> waits = evaluate(state);
         for (Map<String, Double> w : waits) {
             for (String name : w.keySet()) {
+                if (!stat.containsKey(name)) {
+                    stat.put(name, new SummaryStatistics());
+                }
                 stat.get(name).addValue(w.get(name));
             }
         }

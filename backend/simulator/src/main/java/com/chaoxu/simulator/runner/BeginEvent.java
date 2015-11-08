@@ -15,13 +15,16 @@ public class BeginEvent extends Event {
     }
 
     public void invoke() {
-        p.begin = time;
+        p.status = Patient.Status.InProgress;
+        p.stat.begin = time;
         p.machine = m;
         r.waitingRoom.get(p.site).remove(p);
         if (r.curPatient.get(p.site).get(m) != null) {
             throw new RuntimeException("begin patient on occupied machine!");
         }
         r.curPatient.get(p.site).put(m, p);
+
+        r.eventPatients.add(p);
     }
 
     @Override

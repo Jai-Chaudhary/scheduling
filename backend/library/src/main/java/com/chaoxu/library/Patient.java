@@ -17,8 +17,8 @@ public class Patient {
     public Status status;
     public boolean optimized;
 
-    public Stat stat;
-    public Secret secret;
+    public Stat stat = new Stat();
+    public Secret secret = new Secret();
 
     public Patient copy() {
         Patient p = new Patient();

@@ -4,13 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.chaoxu.library.DiscreteDistribution;
+import com.chaoxu.library.State;
+import com.chaoxu.library.OptimizerSetting;
 
 public class Config {
-    public List<PatientClass> patientClasses;
+    public int seed;
     public Map<String, List<String>> sites;
     public Horizon horizon;
-    public int seed;
-    public OptimizerConfig optimizer;
+    public OptimizerSetting optimizer;
+    public PatientConfig patient;
 }
 
 class PatientClass {
@@ -22,14 +24,11 @@ class PatientClass {
     public Integer slot;
 }
 
-class OptimizerConfig {
-    public boolean active;
-    public int advanceTime;
+class PatientConfig {
     public double volunteerProbability;
-    public String objective;
-    public double confidenceLevel;
-    public double patientConfidenceLevel;
-    public int numSamples;
+    public double cancelProbability;
+    public double SDAOPRate;
+    public List<PatientClass> classes;
 }
 
 class Horizon {

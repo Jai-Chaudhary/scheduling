@@ -41,17 +41,16 @@ public class Simulator {
      * and lateness. This will be used as canonical simulation
      * in the front end.
      */
-    public static State simulateWithExpectation(State state) {
-        State s = new State(state);
-        s.optimization = false;
+    public static State simulateWithMedian(State state) {
+        State s = state.copy();
 
         for (Patient p : s.patients) {
-            if (p.completion == null) {
-                p.duration = (int)p.durationDistribution.expectation(
-                        p.begin == null ? 0 : s.time - p.begin);
+            if (p.stat.completion == null) {
+                p.secret.duration = (int)p.durationDistribution.median(
+                        p.stat.begin == null ? 0 : s.time - p.stat.begin);
             }
-            if (p.arrival == null) {
-                p.lateness = (int)p.latenessDistribution.expectation(
+            if (p.stat.arrival == null) {
+                p.secret.lateness = (int)p.latenessDistribution.median(
                         s.time - p.appointment);
             }
         }
@@ -66,17 +65,16 @@ public class Simulator {
      */
     public static State simulateWithSampling(
             State state, RandomBits bits) {
-        State s = new State(state);
-        s.optimization = false;
+        State s = state.copy();
 
         for (Patient p : s.patients) {
-            if (p.completion == null) {
-                p.duration = p.durationDistribution.sample(
-                        p.begin == null ? 0 : s.time - p.begin,
+            if (p.stat.completion == null) {
+                p.secret.duration = p.durationDistribution.sample(
+                        p.stat.begin == null ? 0 : s.time - p.stat.begin,
                         bits.duration.get(p.name));
             }
-            if (p.arrival == null) {
-                p.lateness = p.latenessDistribution.sample(
+            if (p.stat.arrival == null) {
+                p.secret.lateness = p.latenessDistribution.sample(
                         s.time - p.appointment,
                         bits.lateness.get(p.name));
             }

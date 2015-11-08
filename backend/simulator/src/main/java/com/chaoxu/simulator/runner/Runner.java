@@ -29,15 +29,10 @@ import com.chaoxu.simulator.optimizer.Optimizer;
  * seperate states and the structure to support states.
  */
 public class Runner {
-    // set of patients to divert
-    TreeSet<Patient> patientsToOptimize;
-    // set of patients to arrive
-    TreeSet<Patient> patientsToArrive;
-    // patients in waiting room for each site
+    TreeSet<Patient> eventPatients;
     Map<String, TreeSet<Patient>> waitingRoom;
     // current patient under processing of each site
-    Map<String, Map<String, Patient>> curPatient =
-        new HashMap<>();
+    Map<String, Map<String, Patient>> curPatient;
 
     State state;
 
@@ -47,20 +42,14 @@ public class Runner {
         this.state = state;
         this.debug = debug;
 
-        patientsToOptimize = new TreeSet<>(
+        eventPatients = new TreeSet<>(
                 (Patient p, Patient q) -> {
                     int ret = Integer.compare(
-                            p.appointment - state.advanceTime,
-                            q.appointment - state.advanceTime);
+                            nextEvent(p).time,
+                            nextEvent(q).time);
                     return ret != 0 ? ret : p.name.compareTo(q.name);
                 });
-        patientsToArrive = new TreeSet<>(
-                (Patient p, Patient q) -> {
-                    int ret = Integer.compare(
-                            p.appointment + p.lateness,
-                            q.appointment + q.lateness);
-                    return ret != 0 ? ret : p.name.compareTo(q.name);
-                });
+
         curPatient = new HashMap<>();
         for (String s : state.sites.keySet()) {
             curPatient.put(s, new HashMap<>());
@@ -81,31 +70,31 @@ public class Runner {
         }
 
         for (Patient p : state.patients) {
-            switch(p.status()) {
-                case ToOptimize:
-                    // in case patient will arrive before we optimize
-                    if (p.lateness <= -state.advanceTime) {
-                        p.optimized = p.appointment + p.lateness;
-                        patientsToArrive.add(p);
-                    } else {
-                        patientsToOptimize.add(p);
-                    }
+            switch(p.status) {
+                case Init:
+                    eventPatients.add(p);
                     break;
-                case ToArrive:
-                    patientsToArrive.add(p);
+                case Scheduled:
+                    eventPatients.add(p);
                     break;
-                case ToBegin:
+                case Arrived:
                     waitingRoom.get(p.site).add(p);
                     break;
-                case ToComplete:
+                case InProgress:
+                    eventPatients.add(p);
                     if (curPatient.get(p.site).get(p.machine) != null) {
                         throw new RuntimeException("Machine not idling");
                     }
                     curPatient.get(p.site).put(p.machine, p);
                     break;
+                case Completed:
+                    break;
+                case Canceled:
+                    break;
             }
         }
     }
+
 
     /**
      * Return whether stoped because of stopTime.
@@ -137,8 +126,6 @@ public class Runner {
     }
 
     public Event nextEvent() {
-        Event ret = null;
-
         // BeginEvent
         for (String s : state.sites.keySet()) {
             for (String m : state.sites.get(s)) {
@@ -149,27 +136,49 @@ public class Runner {
             }
         }
 
-        // OptimizationEvent
-        if (!patientsToOptimize.isEmpty()) {
-            ret = minEvent(ret, new OptimizationEvent(
-                        patientsToOptimize.first(), this));
-        }
-        // ArrivalEvent
-        if (!patientsToArrive.isEmpty()) {
-            ret = minEvent(ret, new ArrivalEvent(
-                        patientsToArrive.first(), this));
-        }
-        // CompletionEvent
-        for (String s : state.sites.keySet()) {
-            for (String m : state.sites.get(s)) {
-                if (curPatient.get(s).get(m) != null) {
-                    ret = minEvent(ret, new CompletionEvent(
-                                curPatient.get(s).get(m), this));
-                }
+        if (eventPatients.isEmpty())
+            return null;
+
+        return nextEvent(eventPatients.first());
+    }
+
+    private Event nextEvent(Patient p) {
+        if (p.status == Patient.Status.Init) {
+            if (p.secret.schedule != null) {
+                return new ScheduleEvent(p, this);
+            } else if (p.secret.lateness != null) {
+                return new ArrivalEvent(p, this);
+            } else {
+                throw new RuntimeException("Init patient has nothing to do");
             }
         }
-
-        return ret;
+        if (p.status == Patient.Status.Scheduled) {
+            Event e = null;
+            if (p.volunteer && !p.optimized && state.optimizer.active) {
+                e = new OptimizationEvent(p, this);
+            }
+            if (p.secret.cancel != null) {
+                e = minEvent(e, new CancelEvent(p, this));
+            } else if (p.secret.lateness != null) {
+                e = minEvent(e, new ArrivalEvent(p, this));
+            } else {
+                throw new RuntimeException("Scheduled patient has nothing to do");
+            }
+            return e;
+        }
+        if (p.status == Patient.Status.Arrived) {
+            throw new RuntimeException("nextEvent on Arrived patient!");
+        }
+        if (p.status == Patient.Status.InProgress) {
+            return new CompletionEvent(p, this);
+        }
+        if (p.status == Patient.Status.Completed) {
+            throw new RuntimeException("nextEvent on Completed patient!");
+        }
+        if (p.status == Patient.Status.Canceled) {
+            throw new RuntimeException("nextEvent on Canceled patient!");
+        }
+        throw new RuntimeException("Impossible");
     }
 
     private Event minEvent(Event a, Event b) {

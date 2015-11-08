@@ -2,12 +2,12 @@ package com.chaoxu.simulator.runner;
 
 import com.chaoxu.library.Patient;
 
-public class ArrivalEvent extends Event {
+public class ScheduleEvent extends Event {
     private Patient p;
     private Runner r;
 
-    public ArrivalEvent(Patient p, Runner r) {
-        super(p.appointment + p.secret.lateness);
+    public ScheduleEvent(Patient p, Runner r) {
+        super(p.secret.schedule);
         this.p = p;
         this.r = r;
     }
@@ -15,10 +15,10 @@ public class ArrivalEvent extends Event {
     public void invoke() {
         r.eventPatients.remove(p);
 
-        p.status = Patient.Status.Arrived;
-        p.stat.arrival = time;
+        p.status = Patient.Status.Scheduled;
+        p.stat.schedule = time;
 
-        r.waitingRoom.get(p.site).add(p);
+        r.eventPatients.add(p);
     }
 
     @Override

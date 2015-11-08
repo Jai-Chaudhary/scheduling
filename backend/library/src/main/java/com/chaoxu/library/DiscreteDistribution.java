@@ -125,7 +125,7 @@ public class DiscreteDistribution {
     }
 
     public int median() {
-        return sample(base);
+        return sample(.5);
     }
 
     public double expectation() {

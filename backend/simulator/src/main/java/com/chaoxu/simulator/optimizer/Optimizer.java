@@ -39,7 +39,7 @@ public class Optimizer {
 
     public static Result bestSite(State state,
             Patient patient) {
-        Objective objective = Objective.objFactory(state.objective);
+        Objective objective = Objective.objFactory(state.optimizer.objective);
 
         String originalSite = patient.site;
         Map<String, Statistics> objDiff = new HashMap<>();
@@ -75,17 +75,17 @@ public class Optimizer {
         }
 
         Result best = new Result();
-        best.site = patient.originalSite;
+        best.site = patient.site;
         best.stat = new Statistics();
         best.stat.add(0);
 
         for (String site : objDiff.keySet()) {
             Statistics stat = objDiff.get(site);
-            if (stat.ecdf(0) < state.confidenceLevel) continue;
+            if (stat.ecdf(0) < state.optimizer.confidenceLevel) continue;
 
             Statistics patientStat = patientDiff.get(site);
 
-            if (patientStat.ecdf(0) < state.patientConfidenceLevel)
+            if (patientStat.ecdf(0) < state.optimizer.patientConfidenceLevel)
                 continue;
 
             if (stat.stat.getMean() < best.stat.stat.getMean()) {
@@ -96,8 +96,8 @@ public class Optimizer {
         }
 
         if (!best.site.equals(patient.site)) {
-            patient.originalWait = originalWait;
-            patient.divertedWait = originalWait + best.patientStat.stat.getMean();
+            patient.stat.originalWait = originalWait;
+            patient.stat.divertedWait = originalWait + best.patientStat.stat.getMean();
         }
 
         return best;

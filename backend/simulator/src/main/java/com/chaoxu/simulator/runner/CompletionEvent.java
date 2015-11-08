@@ -7,13 +7,16 @@ public class CompletionEvent extends Event {
     private Runner r;
 
     public CompletionEvent(Patient p, Runner r) {
-        super(p.begin + p.duration);
+        super(p.stat.begin + p.secret.duration);
         this.p = p;
         this.r = r;
     }
 
     public void invoke() {
-        p.completion = time;
+        r.eventPatients.remove(p);
+
+        p.status = Patient.Status.Completed;
+        p.stat.completion = time;
         if (r.curPatient.get(p.site).get(p.machine) != p) {
             System.err.println(p);
             System.err.println(r.curPatient.get(p.site).get(p.machine));

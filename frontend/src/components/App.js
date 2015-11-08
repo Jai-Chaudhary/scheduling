@@ -1,24 +1,18 @@
 import React from 'react/addons';
 
 import Config from './Config';
-import Playroom from './Playroom';
 import Animation from './Animation';
-import History from './History';
 
 export default React.createClass({
   componentWillMount() {
     this.handleToConfig();
   },
-  handleToPlayroom(frames) {
-    let e = <Playroom handleToConfig={this.handleToConfig} frames={frames} />;
-    this.setState({element: e});
-  },
-  handleToHistory(schedule) {
-    let e = <History handleToConfig={this.handleToConfig} schedule={schedule} />;
+  handleToAnimation(frames) {
+    let e = <Animation handleToConfig={this.handleToConfig} frames={frames} />;
     this.setState({element: e});
   },
   handleToConfig() {
-    let e = <Config handleToPlayroom={this.handleToPlayroom} handleToHistory={this.handleToHistory} />;
+    let e = <Config handleToAnimation={this.handleToAnimation} />;
     this.setState({element: e});
   },
   render() {

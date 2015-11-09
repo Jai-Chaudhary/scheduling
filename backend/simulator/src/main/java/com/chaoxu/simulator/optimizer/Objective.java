@@ -3,7 +3,7 @@ package com.chaoxu.simulator.optimizer;
 import java.util.Map;
 
 public abstract class Objective {
-    public abstract double value(Map<String, Double> waitingTime);
+    public abstract double value(Map<String, Integer> waitingTime);
 
     public static Objective objFactory(String s) {
         if (s.equals("l1")) {

@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 
 import spark.Spark;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,15 +16,21 @@ import com.chaoxu.configparser.Config;
 import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
 import com.chaoxu.library.PatientStat;
+import com.chaoxu.library.DiscreteDistribution;
 import com.chaoxu.simulator.Simulator;
 import com.chaoxu.simulator.Evaluator;
 
 public class Main {
     private static final int step = 10;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        mapper.readValue(
+                Main.class.getClassLoader().getResource("dist.json"),
+                DiscreteDistribution[].class
+                );
 
         /**
          * request is application/www-form-urlencoded encoded:

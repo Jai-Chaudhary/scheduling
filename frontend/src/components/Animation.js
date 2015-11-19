@@ -1,4 +1,5 @@
 import React from 'react/addons';
+import lodash from 'lodash';
 
 import {avgStat, toTime, ganttHelper} from '../lib/util';
 
@@ -26,7 +27,14 @@ export default React.createClass({
           />
 
           <div>
-            Avg waiting time: {avgStat(frame.stats)}
+            Avg waiting time: {avgStat(frame.stats.wait)} <br/>
+            Total waiting time: {lodash.sum(frame.stats.wait)} <br/>
+            {lodash.map(frame.stats.siteWait,
+                (wt, s) => <div key={s}>{s} avg waiting time: {lodash.round(wt)}</div>)}
+            <br />
+            {lodash.map(frame.stats.overTime,
+                (ot, s) => <div key={s}>{s} overtime: {ot}</div>)}
+            Total overtime: {lodash.sum(frame.stats.overTime)}
           </div>
 
           {ganttHelper(frame.time, frame.animation, frame.stats)}

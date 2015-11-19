@@ -18,15 +18,18 @@
     "84TH": {
       "machines": ["MR1"],
       "horizon": {
-        "begin": 540,
-        "end": 1080
+        "begin": 840,
+        "end": 900
       }
     }
   },
   "optimizer": {
     "active": true,
     "advanceTime": 60,
-    "objective": "l1",
+    "objective": {
+      "waitNorm": "l1",
+      "overTimeWeight": 10
+    },
     "confidenceLevel": 0.7,
     "patientConfidenceLevel": 0.7,
     "numSamples": 100
@@ -34,7 +37,7 @@
   "patient": {
     "volunteerProbability": 0.5,
     "cancelProbability": 0.02,
-    "SDAOPRate": 2,
+    "SDAOPRate": 0.07,
     "classes": [
       {
         "name": "long",

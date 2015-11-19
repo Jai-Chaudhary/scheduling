@@ -14,8 +14,7 @@ public class OptimizerSetting {
     // how many minutes in advance
     // to notify patients of potential change
     public int advanceTime;
-    // string representation of objective
-    public String objective;
+    public ObjectiveSetting objective;
     public double confidenceLevel;
     public double patientConfidenceLevel;
     public int numSamples;

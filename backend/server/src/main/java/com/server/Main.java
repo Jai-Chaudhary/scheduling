@@ -117,7 +117,7 @@ public class Main {
         Map<String, Object> ret = new HashMap<>();
         ret.put("time", state.time);
         ret.put("animation", getStat(Simulator.simulateWithMedian(state)));
-        ret.put("stats", Evaluator.perPatientMedian(state));
+        ret.put("stats", Evaluator.medianStat(state));
         return ret;
     }
 }

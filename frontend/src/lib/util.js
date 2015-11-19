@@ -26,7 +26,7 @@ export function ganttHelper(time, animation, stats) {
   }
 
   function tipCb(d) {
-    const w = Math.round(stats[d.name] * 100) / 100;
+    const w = stats.wait[d.name];
     let ret = `
       ${d.name} wait ${w} <br/>
       appointment ${shortTime(d.appointment)} <br/>
@@ -52,7 +52,7 @@ export function ganttHelper(time, animation, stats) {
     time={toTime(time)}
     stroke={d => nameScale(d.name)}
     tip={tipCb}
-    color={d => waitScale(stats[d.name])}
+    color={d => waitScale(stats.wait[d.name])}
     text={textCb}
   />
 }

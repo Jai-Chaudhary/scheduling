@@ -2,16 +2,36 @@ package com.chaoxu.simulator.optimizer;
 
 import java.util.Map;
 
-public abstract class Objective {
-    public abstract double value(Map<String, Integer> waitingTime);
+import com.chaoxu.simulator.EvaluateResult;
 
-    public static Objective objFactory(String s) {
-        if (s.equals("l1")) {
-            return new L1Obj();
+public class Objective {
+    private String waitNorm;
+    private double overTimeWeight;
+
+    public Objective(String waitNorm, double overTimeWeight) {
+        this.waitNorm = waitNorm;
+        this.overTimeWeight = overTimeWeight;
+    }
+
+    public double value(EvaluateResult result) {
+        double ret = 0;
+        if (waitNorm.equals("l1")) {
+            for (int x : result.wait.values()) {
+                ret += x;
+            }
+        } else {
+            for (int x : result.wait.values()) {
+                ret += x*x;
+            }
+            ret = Math.sqrt(ret * result.wait.size());
         }
-        if (s.equals("l2")) {
-            return new L2Obj();
+
+        int totalOverTime = 0;
+        for (int ot : result.overTime.values()) {
+            totalOverTime += ot;
         }
-        throw new IllegalArgumentException();
+
+        ret += overTimeWeight * totalOverTime;
+        return ret;
     }
 }

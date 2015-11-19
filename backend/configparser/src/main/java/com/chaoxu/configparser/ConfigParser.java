@@ -110,12 +110,12 @@ public class ConfigParser {
         }
 
         // generate SDAOP
-        PoissonDistribution pd = new PoissonDistribution(rng,
-                config.patient.SDAOPRate,
-                PoissonDistribution.DEFAULT_EPSILON,
-                PoissonDistribution.DEFAULT_MAX_ITERATIONS);
         for (String s : config.sites.keySet()) {
             Horizon horizon = config.sites.get(s).horizon;
+            PoissonDistribution pd = new PoissonDistribution(rng,
+                    config.patient.SDAOPRate * (horizon.end - horizon.begin) / 60,
+                    PoissonDistribution.DEFAULT_EPSILON,
+                    PoissonDistribution.DEFAULT_MAX_ITERATIONS);
             for (String m : config.sites.get(s).machines) {
                 int num = pd.sample();
 

@@ -9,6 +9,7 @@ import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
 import com.chaoxu.library.Statistics;
 import com.chaoxu.simulator.Evaluator;
+import com.chaoxu.simulator.EvaluateResult;
 
 class Result {
     public double objQuantile;
@@ -20,20 +21,20 @@ class Result {
 
 public class Optimizer {
 
-    private static double calMeanWait(List<Map<String, Integer>> waits, String name) {
+    private static double calMeanWait(List<EvaluateResult> results, String name) {
         double ret = 0;
-        for (Map<String, Integer> w : waits) ret += w.get(name);
-        return ret / waits.size();
+        for (EvaluateResult res : results) ret += res.wait.get(name);
+        return ret / results.size();
     }
 
     public static Result bestSite(State state,
             Patient patient) {
-        Objective objective = Objective.objFactory(state.optimizer.objective);
+        Objective objective = new Objective(state.optimizer.objective.waitNorm, state.optimizer.objective.overTimeWeight);
         Result result = null;
 
         String originalSite = patient.site;
-        List<Map<String, Integer>> waits = Evaluator.evaluate(state);
-        double originalWait = calMeanWait(waits, patient.name);
+        List<EvaluateResult> results = Evaluator.evaluate(state);
+        double originalWait = calMeanWait(results, patient.name);
 
         for (String site : state.sites.keySet()) {
             if (!site.equals(originalSite)) {
@@ -41,14 +42,14 @@ public class Optimizer {
                 Statistics patientStat = new Statistics();
 
                 patient.site = site;
-                List<Map<String, Integer>> newWaits = Evaluator.evaluate(state);
+                List<EvaluateResult> newResults = Evaluator.evaluate(state);
                 patient.site = originalSite;
 
-                for (int i = 0; i < waits.size(); i++) {
-                    double obj = objective.value(waits.get(i));
-                    double newObj = objective.value(newWaits.get(i));
+                for (int i = 0; i < results.size(); i++) {
+                    double obj = objective.value(results.get(i));
+                    double newObj = objective.value(newResults.get(i));
                     objStat.addValue(newObj - obj);
-                    patientStat.addValue(newWaits.get(i).get(patient.name) - waits.get(i).get(patient.name));
+                    patientStat.addValue(newResults.get(i).wait.get(patient.name) - results.get(i).wait.get(patient.name));
                 }
 
                 double objQuantile = objStat.getCumPct(0);
@@ -60,7 +61,7 @@ public class Optimizer {
                         r.objQuantile = objQuantile;
                         r.patientQuantile = patientQuantile;
                         r.originalWait = originalWait;
-                        r.divertedWait = calMeanWait(newWaits, patient.name);
+                        r.divertedWait = calMeanWait(newResults, patient.name);
                         r.site = site;
 
                         result = r;

@@ -10,6 +10,8 @@ import org.apache.commons.math3.distribution.PoissonDistribution;
 import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
 import com.chaoxu.library.DiscreteDistribution;
+import com.chaoxu.library.SiteConfig;
+import com.chaoxu.library.Horizon;
 import com.chaoxu.library.Util;
 import com.chaoxu.library.RandomBits;
 
@@ -85,9 +87,10 @@ public class ConfigParser {
 
         // generate regular patients
         for (String s : config.sites.keySet()) {
-            for (String m : config.sites.get(s)) {
-                int curTime = config.horizon.begin;
-                while (curTime < config.horizon.end) {
+            Horizon horizon = config.sites.get(s).horizon;
+            for (String m : config.sites.get(s).machines) {
+                int curTime = horizon.begin;
+                while (curTime < horizon.end) {
                     Patient p = pg.nextPatient(s);
                     p.name = String.format("P%s-%s-%s", s, m, Util.toTime(curTime));
                     p.appointment = curTime;
@@ -112,15 +115,16 @@ public class ConfigParser {
                 PoissonDistribution.DEFAULT_EPSILON,
                 PoissonDistribution.DEFAULT_MAX_ITERATIONS);
         for (String s : config.sites.keySet()) {
-            for (String m : config.sites.get(s)) {
+            Horizon horizon = config.sites.get(s).horizon;
+            for (String m : config.sites.get(s).machines) {
                 int num = pd.sample();
 
                 for (int i = 0; i < num; i++) {
                     Patient p = pg.nextPatient(s);
                     p.name = String.format("SDAOP%s-%s-%d", s, m, i);
                     p.appointment = (int)(rng.nextDouble()
-                        * (config.horizon.end - config.horizon.begin)
-                        + config.horizon.begin);
+                        * (horizon.end - horizon.begin)
+                        + horizon.begin);
                     p.volunteer = false;
                     p.secret.schedule = null;
                     p.secret.lateness = 0;

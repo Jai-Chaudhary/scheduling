@@ -6,11 +6,11 @@ import java.util.Map;
 import com.chaoxu.library.DiscreteDistribution;
 import com.chaoxu.library.State;
 import com.chaoxu.library.OptimizerSetting;
+import com.chaoxu.library.SiteConfig;
 
 public class Config {
     public int seed;
-    public Map<String, List<String>> sites;
-    public Horizon horizon;
+    public Map<String, SiteConfig> sites;
     public OptimizerSetting optimizer;
     public PatientConfig patient;
 }
@@ -29,9 +29,4 @@ class PatientConfig {
     public double cancelProbability;
     public double SDAOPRate;
     public List<PatientClass> classes;
-}
-
-class Horizon {
-    public int begin;
-    public int end;
 }

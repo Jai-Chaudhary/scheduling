@@ -22,7 +22,7 @@ public class State {
     // list of patients
     public List<Patient> patients;
     // number of sites
-    public Map<String, List<String>> sites;
+    public Map<String, SiteConfig> sites;
     public OptimizerSetting optimizer;
 
     // optimization is turned off during copying

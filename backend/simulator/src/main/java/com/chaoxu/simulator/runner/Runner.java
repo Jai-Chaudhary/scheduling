@@ -53,7 +53,7 @@ public class Runner {
         curPatient = new HashMap<>();
         for (String s : state.sites.keySet()) {
             curPatient.put(s, new HashMap<>());
-            for (String m : state.sites.get(s)) {
+            for (String m : state.sites.get(s).machines) {
                 curPatient.get(s).put(m, null);
             }
         }
@@ -128,7 +128,7 @@ public class Runner {
     public Event nextEvent() {
         // BeginEvent
         for (String s : state.sites.keySet()) {
-            for (String m : state.sites.get(s)) {
+            for (String m : state.sites.get(s).machines) {
                 if (!isBusy(s, m) && !waitingRoom.get(s).isEmpty()) {
                     Patient p = waitingRoom.get(s).first();
                     return new BeginEvent(p, m, this);

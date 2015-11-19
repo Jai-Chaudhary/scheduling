@@ -1,13 +1,27 @@
 {
   "seed": 2,
   "sites": {
-    "55TH": ["MR1"],
-    "YORK": ["MR1"],
-    "84TH": ["MR1"]
-  },
-  "horizon": {
-    "begin": 450,
-    "end": 1200
+    "55TH": {
+      "machines": ["MR1"],
+      "horizon": {
+        "begin": 450,
+        "end": 1200
+      }
+    },
+    "YORK": {
+      "machines": ["MR1"],
+      "horizon": {
+        "begin": 450,
+        "end": 1200
+      }
+    },
+    "84TH": {
+      "machines": ["MR1"],
+      "horizon": {
+        "begin": 540,
+        "end": 1080
+      }
+    }
   },
   "optimizer": {
     "active": true,

@@ -19,6 +19,7 @@ export function shortTime(x) {
 export function ganttHelper(time, animation, stats) {
   function textCb(p) {
     let ret = '';
+    if (p.schedule==null) ret += 'S';
     if (p.volunteer) ret += 'v';
     if (p.arrival < time && p.begin > time) ret += 'w';
     if (p.originalSite != p.site) ret += 'M';
@@ -29,6 +30,7 @@ export function ganttHelper(time, animation, stats) {
     const w = stats.wait[d.name];
     let ret = `
       ${d.name} wait ${w} <br/>
+      ${d.clazz} <br/>
       appointment ${shortTime(d.appointment)} <br/>
       slot ${d.slot} <br/>
       `;

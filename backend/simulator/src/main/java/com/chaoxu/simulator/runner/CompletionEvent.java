@@ -15,7 +15,6 @@ public class CompletionEvent extends Event {
     public void invoke() {
         r.eventPatients.remove(p);
 
-        p.status = Patient.Status.Completed;
         p.stat.completion = time;
         if (r.curPatient.get(p.site).get(p.machine) != p) {
             System.err.println(p);

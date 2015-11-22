@@ -15,7 +15,6 @@ public class ScheduleEvent extends Event {
     public void invoke() {
         r.eventPatients.remove(p);
 
-        p.status = Patient.Status.Scheduled;
         p.stat.schedule = time;
 
         r.eventPatients.add(p);

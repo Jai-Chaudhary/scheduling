@@ -15,10 +15,9 @@ public class CancelEvent extends Event {
     public void invoke() {
         r.eventPatients.remove(p);
 
-        if (p.status != Patient.Status.Scheduled) {
+        if (p.status() != Patient.Status.Scheduled) {
             throw new RuntimeException("Cancel non-scheduled patients!");
         }
-        p.status = Patient.Status.Canceled;
         p.stat.cancel = time;
     }
 

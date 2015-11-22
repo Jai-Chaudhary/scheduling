@@ -15,7 +15,6 @@ public class ArrivalEvent extends Event {
     public void invoke() {
         r.eventPatients.remove(p);
 
-        p.status = Patient.Status.Arrived;
         p.stat.arrival = time;
 
         r.waitingRoom.get(p.site).add(p);

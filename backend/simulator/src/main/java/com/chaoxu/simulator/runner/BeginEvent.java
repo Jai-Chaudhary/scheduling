@@ -15,7 +15,6 @@ public class BeginEvent extends Event {
     }
 
     public void invoke() {
-        p.status = Patient.Status.InProgress;
         p.stat.begin = time;
         p.machine = m;
         r.waitingRoom.get(p.site).remove(p);

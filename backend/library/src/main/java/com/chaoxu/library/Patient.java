@@ -14,7 +14,6 @@ public class Patient {
     // status, available to optimizer
     public String site;
     public String machine;
-    public Status status;
     public boolean optimized;
 
     public Stat stat = new Stat();
@@ -34,7 +33,6 @@ public class Patient {
 
         p.site = site;
         p.machine = machine;
-        p.status = status;
         p.optimized = optimized;
 
         p.stat = stat.copy();
@@ -45,6 +43,15 @@ public class Patient {
     @Override
     public String toString() {
         return name;
+    }
+
+    public Status status() {
+        if (stat.cancel != null) return Status.Canceled;
+        if (stat.completion != null) return Status.Completed;
+        if (stat.begin != null) return Status.InProgress;
+        if (stat.arrival != null) return Status.Arrived;
+        if (stat.schedule != null) return Status.Scheduled;
+        return Status.Init;
     }
 
     public enum Status {

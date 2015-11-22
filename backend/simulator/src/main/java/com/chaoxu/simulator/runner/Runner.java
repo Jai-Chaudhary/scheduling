@@ -70,7 +70,7 @@ public class Runner {
         }
 
         for (Patient p : state.patients) {
-            switch(p.status) {
+            switch(p.status()) {
                 case Init:
                     eventPatients.add(p);
                     break;
@@ -143,7 +143,7 @@ public class Runner {
     }
 
     private Event nextEvent(Patient p) {
-        if (p.status == Patient.Status.Init) {
+        if (p.status() == Patient.Status.Init) {
             if (p.secret.schedule != null) {
                 return new ScheduleEvent(p, this);
             } else if (p.secret.lateness != null) {
@@ -152,7 +152,7 @@ public class Runner {
                 throw new RuntimeException("Init patient has nothing to do");
             }
         }
-        if (p.status == Patient.Status.Scheduled) {
+        if (p.status() == Patient.Status.Scheduled) {
             Event e = null;
             if (p.volunteer && !p.optimized && state.optimizer.active) {
                 e = new OptimizationEvent(p, this);
@@ -166,16 +166,16 @@ public class Runner {
             }
             return e;
         }
-        if (p.status == Patient.Status.Arrived) {
+        if (p.status() == Patient.Status.Arrived) {
             throw new RuntimeException("nextEvent on Arrived patient!");
         }
-        if (p.status == Patient.Status.InProgress) {
+        if (p.status() == Patient.Status.InProgress) {
             return new CompletionEvent(p, this);
         }
-        if (p.status == Patient.Status.Completed) {
+        if (p.status() == Patient.Status.Completed) {
             throw new RuntimeException("nextEvent on Completed patient!");
         }
-        if (p.status == Patient.Status.Canceled) {
+        if (p.status() == Patient.Status.Canceled) {
             throw new RuntimeException("nextEvent on Canceled patient!");
         }
         throw new RuntimeException("Impossible");

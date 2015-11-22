@@ -32,7 +32,7 @@ public class PatientStat {
         originalSite = p.stat.originalSite;
         site = p.site;
         machine = p.machine;
-        status = p.status;
+        status = p.status();
 
         schedule = p.stat.schedule;
         arrival = p.stat.arrival;

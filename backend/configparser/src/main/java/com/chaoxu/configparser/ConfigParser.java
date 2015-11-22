@@ -52,7 +52,6 @@ class PatientGenerator {
         p.seed = rng.nextInt();
 
         p.site = site;
-        p.status = Patient.Status.Init;
         p.optimized = false;
 
         p.stat.originalSite = site;

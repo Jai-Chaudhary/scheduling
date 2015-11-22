@@ -36,10 +36,10 @@ public class State {
 
         s.patients = new ArrayList<>();
         for (Patient p : patients) {
-            if (p.status == Patient.Status.Scheduled ||
-                p.status == Patient.Status.Arrived ||
-                p.status == Patient.Status.InProgress ||
-                p.status == Patient.Status.Completed) {
+            if (p.status() == Patient.Status.Scheduled ||
+                p.status() == Patient.Status.Arrived ||
+                p.status() == Patient.Status.InProgress ||
+                p.status() == Patient.Status.Completed) {
                 s.patients.add(p.copy());
             }
         }

@@ -11,13 +11,6 @@ import com.chaoxu.library.Statistics;
 import com.chaoxu.simulator.evaluator.Evaluator;
 import com.chaoxu.simulator.evaluator.EvaluateResult;
 
-class Result {
-    public double objQuantile;
-    public double patientQuantile;
-    public double originalWait;
-    public double divertedWait;
-    public String site;
-}
 
 public class Optimizer {
 
@@ -27,67 +20,92 @@ public class Optimizer {
         return ret / results.size();
     }
 
-    public static Result bestSite(State state,
-            Patient patient) {
-        Objective objective = new Objective(state.optimizer.objective.waitNorm, state.optimizer.objective.overTimeWeight);
-        Result result = null;
+    private static DiversionQuality getQuality(List<EvaluateResult> results,
+            List<EvaluateResult> newResults,
+            Objective objective, Patient patient) {
+        DiversionQuality res = new DiversionQuality();
 
-        String originalSite = patient.site;
+        res.originalWait = calMeanWait(results, patient.name);
+        res.divertedWait = calMeanWait(newResults, patient.name);
+
+        Statistics objStat = new Statistics();
+        Statistics patientStat = new Statistics();
+        for (int i = 0; i < results.size(); i++) {
+            double obj = objective.value(results.get(i));
+            double newObj = objective.value(newResults.get(i));
+            objStat.addValue(newObj - obj);
+            patientStat.addValue(newResults.get(i).wait.get(patient.name) - results.get(i).wait.get(patient.name));
+        }
+
+        res.objQuantile = objStat.getCumPct(0);
+        res.patientQuantile = patientStat.getCumPct(0);
+
+        return res;
+    }
+
+    public static Map<Diversion, DiversionQuality> getQualities(
+            State state, List<Diversion> diversions) {
+        Map<Diversion, DiversionQuality> res = new HashMap<>();
+
         List<EvaluateResult> results = Evaluator.evaluate(state);
-        double originalWait = calMeanWait(results, patient.name);
+        Objective objective = new Objective(state.optimizer.objective.waitNorm,
+                state.optimizer.objective.overTimeWeight);
 
-        for (String site : state.sites.keySet()) {
-            if (!site.equals(originalSite)) {
-                Statistics objStat = new Statistics();
-                Statistics patientStat = new Statistics();
+        for (Diversion diversion : diversions) {
+            Patient patient = diversion.patient;
+            String originalSite = patient.site;
 
-                patient.site = site;
-                List<EvaluateResult> newResults = Evaluator.evaluate(state);
-                patient.site = originalSite;
+            patient.site = diversion.site;
+            List<EvaluateResult> newResults = Evaluator.evaluate(state);
+            patient.site = originalSite;
 
-                for (int i = 0; i < results.size(); i++) {
-                    double obj = objective.value(results.get(i));
-                    double newObj = objective.value(newResults.get(i));
-                    objStat.addValue(newObj - obj);
-                    patientStat.addValue(newResults.get(i).wait.get(patient.name) - results.get(i).wait.get(patient.name));
-                }
-
-                double objQuantile = objStat.getCumPct(0);
-                double patientQuantile = patientStat.getCumPct(0);
-                if (objQuantile >= state.optimizer.confidenceLevel
-                        && patientQuantile >= state.optimizer.patientConfidenceLevel) {
-                    if (result == null || result.objQuantile < objQuantile) {
-                        Result r = new Result();
-                        r.objQuantile = objQuantile;
-                        r.patientQuantile = patientQuantile;
-                        r.originalWait = originalWait;
-                        r.divertedWait = calMeanWait(newResults, patient.name);
-                        r.site = site;
-
-                        result = r;
-                    }
-                }
+            DiversionQuality q = getQuality(results, newResults,
+                    objective, patient);
+            if (q.objQuantile >= state.optimizer.confidenceLevel &&
+                    q.patientQuantile >= state.optimizer.patientConfidenceLevel) {
+                res.put(diversion, q);
             }
         }
 
-        return result;
+        return res;
     }
 
     public static String optimize(State state, Patient patient,
             boolean debug) {
-        Result result = bestSite(state, patient);
+        List<Diversion> diversions = new ArrayList<>();
+        for (String site : state.sites.keySet()) {
+            if (!site.equals(patient.site)) {
+                Diversion diversion = new Diversion();
+                diversion.patient = patient;
+                diversion.site = site;
+                diversions.add(diversion);
+            }
+        }
 
-        if (result != null) {
+        Map<Diversion, DiversionQuality> qualities = getQualities(
+                state, diversions);
+
+        String bestSite = null;
+        DiversionQuality bestQuality = null;
+        for (Diversion diversion : qualities.keySet()) {
+            DiversionQuality q = qualities.get(diversion);
+            if (bestQuality == null || bestQuality.objQuantile < q.objQuantile) {
+                bestQuality = q;
+                bestSite = diversion.site;
+            }
+        }
+
+        if (bestQuality != null) {
             if (debug) {
                 System.out.println(String.format(
                             "Diversion: %s from %s to %s, obj %f, patient %f",
-                            patient, patient.site, result.site,
-                            result.objQuantile, result.patientQuantile));
+                            patient, patient.site, bestSite,
+                            bestQuality.objQuantile, bestQuality.patientQuantile));
             }
 
-            patient.stat.originalWait = result.originalWait;
-            patient.stat.divertedWait = result.divertedWait;
-            return result.site;
+            patient.stat.originalWait = bestQuality.originalWait;
+            patient.stat.divertedWait = bestQuality.divertedWait;
+            return bestSite;
         }
 
         return patient.site;

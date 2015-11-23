@@ -74,7 +74,7 @@ public class Main {
         Spark.post("/evaluate", (req, res) -> {
             State state = mapper.readValue(req.body(), State.class);
 
-            Evaluator.medianStat(state);
+            Evaluator.getMetric(state);
 
 
             res.type("application/json");
@@ -129,7 +129,7 @@ public class Main {
         Map<String, Object> ret = new HashMap<>();
         ret.put("time", state.time);
         ret.put("animation", getStat(Simulator.simulateWithMedian(state)));
-        ret.put("stats", Evaluator.medianStat(state));
+        ret.put("stats", Evaluator.getMetric(state));
         return ret;
     }
 }

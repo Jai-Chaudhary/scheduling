@@ -87,19 +87,18 @@ public class Evaluator {
         return ret;
     }
 
-    public static Map<String, Object> medianStat(State state) {
-        List<EvaluateResult> results = evaluate(state);
-
-        Map<String, Statistics> stat = new HashMap<>();
+    public static EvaluateMetric getMetric(List<EvaluateResult> results,
+            State state) {
+        Map<String, Statistics> waitStat = new HashMap<>();
         Map<String, Statistics> overTimeStat = new HashMap();
 
         for (EvaluateResult res : results) {
             Map<String, Integer> w = res.wait;
             for (String name : w.keySet()) {
-                if (!stat.containsKey(name)) {
-                    stat.put(name, new Statistics());
+                if (!waitStat.containsKey(name)) {
+                    waitStat.put(name, new Statistics());
                 }
-                stat.get(name).addValue(w.get(name));
+                waitStat.get(name).addValue(w.get(name));
             }
 
             Map<String, Integer> o = res.overTime;
@@ -111,11 +110,9 @@ public class Evaluator {
             }
         }
 
-        Map<String, Object> ret = new HashMap<>();
-
         Map<String, Integer> wait = new HashMap<>();
-        for (String name : stat.keySet()) {
-            wait.put(name, (int)stat.get(name).getMedian());
+        for (String name : waitStat.keySet()) {
+            wait.put(name, (int)waitStat.get(name).getMedian());
         }
 
         Map<String, Integer> overTime = new HashMap<>();
@@ -137,9 +134,14 @@ public class Evaluator {
             siteWait.put(s, siteStat.get(s).getMean());
         }
 
-        ret.put("wait", wait);
-        ret.put("overTime", overTime);
-        ret.put("siteWait", siteWait);
-        return ret;
+        EvaluateMetric metric = new EvaluateMetric();
+        metric.wait = wait;
+        metric.overTime = overTime;
+        metric.siteWait = siteWait;
+        return metric;
+    }
+
+    public static EvaluateMetric getMetric(State state) {
+        return getMetric(evaluate(state), state);
     }
 }

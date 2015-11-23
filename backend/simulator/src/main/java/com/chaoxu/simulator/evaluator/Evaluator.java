@@ -15,6 +15,7 @@ import com.chaoxu.library.RandomBits;
 import com.chaoxu.library.Statistics;
 import com.chaoxu.library.Horizon;
 import com.chaoxu.simulator.Simulator;
+import com.chaoxu.simulator.optimizer.Diversion;
 
 public class Evaluator {
     static private List<RandomBits> generatelBits(State state) {
@@ -87,7 +88,7 @@ public class Evaluator {
         return ret;
     }
 
-    public static EvaluateMetric getMetric(List<EvaluateResult> results,
+    private static EvaluateMetric getMetric(List<EvaluateResult> results,
             State state) {
         Map<String, Statistics> waitStat = new HashMap<>();
         Map<String, Statistics> overTimeStat = new HashMap();
@@ -143,5 +144,16 @@ public class Evaluator {
 
     public static EvaluateMetric getMetric(State state) {
         return getMetric(evaluate(state), state);
+    }
+
+    public static EvaluateMetric getMetric(Diversion diversion,
+            State state) {
+        Patient patient = diversion.patient;
+        String originalSite = patient.site;
+        patient.site = diversion.site;
+        EvaluateMetric res = getMetric(state);
+        patient.site = originalSite;
+
+        return res;
     }
 }

@@ -19,6 +19,9 @@ import com.chaoxu.library.PatientStat;
 import com.chaoxu.library.DiscreteDistribution;
 import com.chaoxu.simulator.Simulator;
 import com.chaoxu.simulator.evaluator.Evaluator;
+import com.chaoxu.simulator.optimizer.Diversion;
+import com.chaoxu.simulator.optimizer.DiversionQuality;
+import com.chaoxu.simulator.optimizer.Optimizer;
 
 public class Main {
     private static final int step = 10;
@@ -71,16 +74,37 @@ public class Main {
             return mapper.writeValueAsString(getStat(state));
         });
 
-        Spark.post("/evaluate", (req, res) -> {
+        Spark.post("/evaluate_optimize", (req, res) -> {
             State state = mapper.readValue(req.body(), State.class);
 
-            Evaluator.getMetric(state);
+            List<Diversion> diversions = new ArrayList<>();
+            for (Patient p : state.patients)
+                if (p.appointment >= state.time + state.optimizer.advanceTime &&
+                        p.appointment <= state.time + state.optimizer.advanceTime + 60) // TODO: magic number
+                    for (String s : state.sites.keySet())
+                        if (!s.equals(p.site)) {
+                            Diversion diversion = new Diversion();
+                            diversion.patient = p;
+                            diversion.site = s;
+                            diversions.add(diversion);
+                        }
 
+            Map<Diversion, DiversionQuality> qualities = Optimizer.getQualities(
+                    state, diversions);
+            List<Map<String, Object>> diversionMetrics = new ArrayList<>();
+            for (Diversion diversion : qualities.keySet()) {
+                Map<String, Object> tmp = new HashMap<>();
+                tmp.put("diversion", diversion);
+                tmp.put("stat", Evaluator.getMetric(diversion, state));
+                diversionMetrics.add(tmp);
+            }
+
+            Map<String, Object> ret = getFrame(state);
+            ret.put("diversionMetrics", diversionMetrics);
 
             res.type("application/json");
             res.header("Content-Encoding", "gzip");
-
-            return "hello";
+            return mapper.writeValueAsString(ret);
         });
 
         /**

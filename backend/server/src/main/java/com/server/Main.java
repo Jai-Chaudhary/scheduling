@@ -18,7 +18,7 @@ import com.chaoxu.library.Patient;
 import com.chaoxu.library.PatientStat;
 import com.chaoxu.library.DiscreteDistribution;
 import com.chaoxu.simulator.Simulator;
-import com.chaoxu.simulator.Evaluator;
+import com.chaoxu.simulator.evaluator.Evaluator;
 
 public class Main {
     private static final int step = 10;
@@ -69,6 +69,18 @@ public class Main {
             res.header("Content-Encoding", "gzip");
 
             return mapper.writeValueAsString(getStat(state));
+        });
+
+        Spark.post("/evaluate", (req, res) -> {
+            State state = mapper.readValue(req.body(), State.class);
+
+            Evaluator.medianStat(state);
+
+
+            res.type("application/json");
+            res.header("Content-Encoding", "gzip");
+
+            return "hello";
         });
 
         /**

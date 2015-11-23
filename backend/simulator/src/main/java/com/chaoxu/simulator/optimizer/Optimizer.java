@@ -8,8 +8,8 @@ import java.util.HashMap;
 import com.chaoxu.library.State;
 import com.chaoxu.library.Patient;
 import com.chaoxu.library.Statistics;
-import com.chaoxu.simulator.Evaluator;
-import com.chaoxu.simulator.EvaluateResult;
+import com.chaoxu.simulator.evaluator.Evaluator;
+import com.chaoxu.simulator.evaluator.EvaluateResult;
 
 class Result {
     public double objQuantile;

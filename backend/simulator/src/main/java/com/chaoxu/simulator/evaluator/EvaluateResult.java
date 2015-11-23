@@ -1,4 +1,4 @@
-package com.chaoxu.simulator;
+package com.chaoxu.simulator.evaluator;
 
 import java.util.Map;
 import java.util.HashMap;

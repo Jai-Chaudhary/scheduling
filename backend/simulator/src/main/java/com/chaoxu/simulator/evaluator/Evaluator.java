@@ -1,4 +1,4 @@
-package com.chaoxu.simulator;
+package com.chaoxu.simulator.evaluator;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -14,6 +14,7 @@ import com.chaoxu.library.Patient;
 import com.chaoxu.library.RandomBits;
 import com.chaoxu.library.Statistics;
 import com.chaoxu.library.Horizon;
+import com.chaoxu.simulator.Simulator;
 
 public class Evaluator {
     static private List<RandomBits> generatelBits(State state) {

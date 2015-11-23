@@ -2,7 +2,7 @@ package com.chaoxu.simulator.optimizer;
 
 import java.util.Map;
 
-import com.chaoxu.simulator.EvaluateResult;
+import com.chaoxu.simulator.evaluator.EvaluateResult;
 
 public class Objective {
     private String waitNorm;

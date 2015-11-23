@@ -83,7 +83,8 @@ public class Runner {
                 case InProgress:
                     eventPatients.add(p);
                     if (curPatient.get(p.site).get(p.machine) != null) {
-                        throw new RuntimeException("Machine not idling");
+                        String msg = String.format("Machine %s-%s is holding patient %s, cannot process patient %s", p.site, p.machine, curPatient.get(p.site).get(p.machine), p);
+                        throw new RuntimeException(msg);
                     }
                     curPatient.get(p.site).put(p.machine, p);
                     break;

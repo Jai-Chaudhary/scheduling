@@ -2,6 +2,7 @@ package com.chaoxu.configparser;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -84,12 +85,15 @@ public class ConfigParser {
 
         List<Patient> ret = new ArrayList<>();
 
+        List<String> sites = new ArrayList<>(config.sites.keySet());
+        Collections.sort(sites);
+
         // generate regular patients
-        for (String s : config.sites.keySet()) {
+        for (String s : sites) {
             Horizon horizon = config.sites.get(s).horizon;
             for (String m : config.sites.get(s).machines) {
                 int curTime = horizon.begin;
-                while (curTime < horizon.end) {
+                while (true) {
                     Patient p = pg.nextPatient(s);
                     p.name = String.format("P%s-%s-%s", s, m, Util.toTime(curTime));
                     p.appointment = curTime;
@@ -101,15 +105,19 @@ public class ConfigParser {
                         p.secret.cancel = p.appointment - 120;
                     }
                     p.secret.schedule = 0;
-                    ret.add(p);
 
                     curTime += p.slot;
+                    if (curTime <= horizon.end) {
+                        ret.add(p);
+                    } else {
+                        break;
+                    }
                 }
             }
         }
 
         // generate SDAOP
-        for (String s : config.sites.keySet()) {
+        for (String s : sites) {
             Horizon horizon = config.sites.get(s).horizon;
             PoissonDistribution pd = null;
             if (config.patient.SDAOPRate > 0) {

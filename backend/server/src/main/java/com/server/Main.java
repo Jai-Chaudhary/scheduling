@@ -71,8 +71,11 @@ public class Main {
             res.type("application/json");
             res.header("Content-Encoding", "gzip");
 
-            SimulateStat ret = new SimulateStat();
-            ret.patients = getStat(state);
+            SimulateSummary ret = new SimulateSummary();
+            ret.patients = new ArrayList<PatientSummary>();
+            for (Patient p : state.patients)
+                if (p.status() == Patient.Status.Completed)
+                    ret.patients.add(new PatientSummary(p));
             ret.overTime = Evaluator.getOverTime(state);
 
             return mapper.writeValueAsString(ret);
@@ -152,8 +155,7 @@ public class Main {
     private static List<PatientStat> getStat(State state) {
         List<PatientStat> ret = new ArrayList<>();
         for (Patient p : state.patients)
-            if (p.status() == Patient.Status.Completed)
-                ret.add(new PatientStat(p));
+            ret.add(new PatientStat(p));
         return ret;
     }
 
@@ -166,7 +168,28 @@ public class Main {
     }
 }
 
-class SimulateStat {
-    public List<PatientStat> patients;
+class SimulateSummary {
+    public List<PatientSummary> patients;
     public Map<String, Integer> overTime;
+}
+
+class PatientSummary {
+    public String name;
+    public String site;
+    public int wait;
+
+    public boolean volunteer;
+    public boolean diverted;
+    public Double originalWait;
+    public Double divertedWait;
+
+    public PatientSummary(Patient p) {
+        name = p.name;
+        site = p.site;
+        wait = p.getWaitingTime();
+        volunteer = p.volunteer;
+        diverted = !p.site.equals(p.stat.originalSite);
+        originalWait = p.stat.originalWait;
+        divertedWait = p.stat.divertedWait;
+    }
 }

@@ -10,14 +10,14 @@ config = json.load(open('exp.json'))
 
 def go(seed, volunteerProbability, patientConfidenceLevel, advanceTime):
     config['seed'] = seed
-    config['optimizer']['volunteerProbability'] = volunteerProbability
+    config['patient']['volunteerProbability'] = volunteerProbability
     config['optimizer']['patientConfidenceLevel'] = patientConfidenceLevel
     config['optimizer']['advanceTime'] = advanceTime
 
     state = requests.post(javaServer + '/parse_synthetic', json=config).json()
     result = requests.post(javaServer + '/simulate', json=state).json()
 
-    return result['patients']
+    return result
 
 random.seed(0)
 numReplication = 100

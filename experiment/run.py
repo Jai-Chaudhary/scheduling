@@ -21,27 +21,33 @@ def go(seed, volunteerProbability, patientConfidenceLevel, advanceTime):
 
 random.seed(0)
 numReplication = 100
-allVolunteerProbability = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
-allPatientConfidenceLevel = [0, 0.7]
-allAdvanceTime = [30, 60, 90]
+allVolunteerProbability = [0]
+allPatientConfidenceLevel = [0.7]
+allAdvanceTime = [60]
 allSeeds = [random.randint(0, 2**31) for i in range(numReplication)]
 
 for volunteerProbability in allVolunteerProbability:
     for patientConfidenceLevel in allPatientConfidenceLevel:
         for advanceTime in allAdvanceTime:
             for seed in allSeeds:
-                filename = 'data/{}_{}_{}_{}.csv'.format(volunteerProbability,
-                                                         patientConfidenceLevel,
-                                                         advanceTime,
-                                                         seed)
+                filename = 'data/wait/{}.csv'.format(seed)
 
                 if os.path.isfile(filename) and os.stat(filename).st_size > 0:
                     continue
 
-                patients = go(seed, volunteerProbability, patientConfidenceLevel, advanceTime)
+                result = go(seed, volunteerProbability, patientConfidenceLevel, advanceTime)
+                patients = result['patients']
+                overTime = result['overTime']
+
                 writer = csv.DictWriter(open(filename, 'w'), patients[0].keys())
                 writer.writeheader()
                 for p in patients:
                     writer.writerow(p)
+
+                filename = 'data/overtime/{}.csv'.format(seed)
+                writer = csv.DictWriter(open(filename, 'w'), ['site', 'overtime'])
+                writer.writeheader()
+                for s in overTime:
+                    writer.writerow({'site': s, 'overtime': overTime[s]})
 
             print('finished {} {} {}'.format(volunteerProbability, patientConfidenceLevel, advanceTime))

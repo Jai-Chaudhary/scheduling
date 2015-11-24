@@ -1,5 +1,7 @@
 package com.chaoxu.library;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Patient {
     // available to optimizer
     public String name;
@@ -45,6 +47,7 @@ public class Patient {
         return name;
     }
 
+    @JsonIgnore
     public Status status() {
         if (stat.cancel != null) return Status.Canceled;
         if (stat.completion != null) return Status.Completed;
@@ -52,6 +55,11 @@ public class Patient {
         if (stat.arrival != null) return Status.Arrived;
         if (stat.schedule != null) return Status.Scheduled;
         return Status.Init;
+    }
+
+    @JsonIgnore
+    public int getWaitingTime() {
+        return Math.max(stat.begin - Math.max(stat.arrival, appointment),0);
     }
 
     public enum Status {

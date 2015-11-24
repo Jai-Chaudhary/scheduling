@@ -36,31 +36,24 @@ public class Evaluator {
         return lBits;
     }
 
-    private static EvaluateResult evaluateOne(
-            State state, RandomBits bits) {
-        Map<String, Integer> waitingTime = new HashMap<>();
-
-        State newState = Simulator.simulateWithSampling(state, bits);
-        for (Patient p : newState.patients) {
-            waitingTime.put(p.name,
-                        Math.max(p.stat.begin - Math.max(p.stat.arrival, p.appointment),0));
-        }
-
+    public static Map<String, Integer> getOverTime(State state) {
         Map<String, Integer> actualBegin = new HashMap<>();
         Map<String, Integer> actualEnd = new HashMap<>();
 
-        for (Patient p : newState.patients) {
-            if (actualBegin.get(p.site) == null || actualBegin.get(p.site) > p.stat.arrival) {
-                actualBegin.put(p.site, p.stat.arrival);
+        for (Patient p : state.patients)
+            if (p.status() == Patient.Status.Completed) {
+                if (actualBegin.get(p.site) == null || actualBegin.get(p.site) > p.stat.arrival) {
+                    actualBegin.put(p.site, p.stat.arrival);
+                }
+
+                if (actualEnd.get(p.site) == null || actualEnd.get(p.site) < p.stat.completion) {
+                    actualEnd.put(p.site, p.stat.completion);
+                }
             }
 
-            if (actualEnd.get(p.site) == null || actualEnd.get(p.site) < p.stat.completion) {
-                actualEnd.put(p.site, p.stat.completion);
-            }
-        }
         Map<String, Integer> overTime = new HashMap<>();
-        for (String s : newState.sites.keySet()) {
-            Horizon horizon = newState.sites.get(s).horizon;
+        for (String s : state.sites.keySet()) {
+            Horizon horizon = state.sites.get(s).horizon;
             int ot = 0;
             if (actualBegin.get(s) != null && actualBegin.get(s) < horizon.begin) {
                 ot += horizon.begin - actualBegin.get(s);
@@ -70,10 +63,21 @@ public class Evaluator {
             }
             overTime.put(s, ot);
         }
+        return overTime;
+    }
+
+    private static EvaluateResult evaluateOne(
+            State state, RandomBits bits) {
+        Map<String, Integer> waitingTime = new HashMap<>();
+
+        State newState = Simulator.simulateWithSampling(state, bits);
+        for (Patient p : newState.patients) {
+            waitingTime.put(p.name, p.getWaitingTime());
+        }
 
         EvaluateResult res = new EvaluateResult();
         res.wait = waitingTime;
-        res.overTime = overTime;
+        res.overTime = getOverTime(newState);
 
         return res;
     }

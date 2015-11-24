@@ -71,7 +71,11 @@ public class Main {
             res.type("application/json");
             res.header("Content-Encoding", "gzip");
 
-            return mapper.writeValueAsString(getStat(state));
+            SimulateStat ret = new SimulateStat();
+            ret.patients = getStat(state);
+            ret.overTime = Evaluator.getOverTime(state);
+
+            return mapper.writeValueAsString(ret);
         });
 
         Spark.post("/evaluate_optimize", (req, res) -> {
@@ -148,7 +152,8 @@ public class Main {
     private static List<PatientStat> getStat(State state) {
         List<PatientStat> ret = new ArrayList<>();
         for (Patient p : state.patients)
-            ret.add(new PatientStat(p));
+            if (p.status() == Patient.Status.Completed)
+                ret.add(new PatientStat(p));
         return ret;
     }
 
@@ -159,4 +164,9 @@ public class Main {
         ret.put("stats", Evaluator.getMetric(state));
         return ret;
     }
+}
+
+class SimulateStat {
+    public List<PatientStat> patients;
+    public Map<String, Integer> overTime;
 }

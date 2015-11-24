@@ -94,7 +94,10 @@ public class Main {
             List<Map<String, Object>> diversionMetrics = new ArrayList<>();
             for (Diversion diversion : qualities.keySet()) {
                 Map<String, Object> tmp = new HashMap<>();
-                tmp.put("diversion", diversion);
+                Map<String, Object> d = new HashMap<>();
+                d.put("patient", diversion.patient.toString());
+                d.put("site", diversion.site);
+                tmp.put("diversion", d);
                 tmp.put("stat", Evaluator.getMetric(diversion, state));
                 diversionMetrics.add(tmp);
             }

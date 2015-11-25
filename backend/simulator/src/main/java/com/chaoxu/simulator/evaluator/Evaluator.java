@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.MersenneTwister;
@@ -84,11 +85,10 @@ public class Evaluator {
 
     public static List<EvaluateResult> evaluate(State state) {
         State s = state.copy();
-        List<EvaluateResult> ret = new ArrayList<>();
         List<RandomBits> lBits = generatelBits(s);
-        for (RandomBits bit : lBits) {
-            ret.add(evaluateOne(s, bit));
-        }
+        List<EvaluateResult> ret = lBits.parallelStream()
+            .map(bit -> evaluateOne(s, bit))
+            .collect(Collectors.toList());
         return ret;
     }
 

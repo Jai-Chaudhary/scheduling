@@ -27,7 +27,7 @@
     "active": true,
     "advanceTime": 60,
     "objective": {
-      "waitNorm": "l1",
+      "waitNorm": "l2",
       "overTimeWeight": 10
     },
     "confidenceLevel": 0.7,
@@ -37,7 +37,7 @@
   "patient": {
     "volunteerProbability": 0.5,
     "cancelProbability": 0.02,
-    "SDAOPRate": 0.07,
+    "SDAOPRate": 0.1,
     "classes": [
       {
         "name": "long",

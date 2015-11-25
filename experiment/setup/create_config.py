@@ -1,6 +1,7 @@
 import json
+import sys
 
-top_scans = 5
+top_scans = 15
 
 def expectation(d):
     return sum(k*x for k, x in enumerate(d['pmf'])) + d['base']
@@ -30,5 +31,58 @@ for p in pc:
     p['percent'] /= sumn
 
 config['patient']['classes'] = pc
+
+if len(sys.argv) > 1 and sys.argv[1] == '7sites':
+    config['sites'] = {
+        "Site1": {
+            "machines": ["MR1"],
+            "horizon": {
+                "begin": 450,
+                "end": 1320
+            }
+        },
+        "Site2": {
+            "machines": ["MR1"],
+            "horizon": {
+                "begin": 450,
+                "end": 1320
+            }
+        },
+        "Site3": {
+            "machines": ["MR1"],
+            "horizon": {
+                "begin": 450,
+                "end": 1320
+            }
+        },
+        "Site4": {
+            "machines": ["MR1"],
+            "horizon": {
+                "begin": 450,
+                "end": 1320
+            }
+        },
+        "Site5": {
+            "machines": ["MR1"],
+            "horizon": {
+                "begin": 450,
+                "end": 1320
+            }
+        },
+        "Site6": {
+            "machines": ["MR1"],
+            "horizon": {
+                "begin": 450,
+                "end": 1320
+            }
+        },
+        "Site7": {
+            "machines": ["MR1"],
+            "horizon": {
+                "begin": 450,
+                "end": 1320
+            }
+        }
+    }
 
 json.dump(config, open('../exp.json', 'w'), indent=4)

@@ -1,19 +1,132 @@
 {
-    "seed": 2,
-    "sites": {
-        "Site7": {
-            "horizon": {
-                "begin": 450,
-                "end": 1320
-            },
-            "machines": [
-                "MR1"
-            ]
+    "optimizer": {
+        "confidenceLevel": 0.7,
+        "patientConfidenceLevel": 0.7,
+        "active": true,
+        "numSamples": 100,
+        "objective": {
+            "waitNorm": "l2",
+            "overTimeWeight": 10
         },
-        "Site1": {
+        "advanceTime": 60
+    },
+    "patient": {
+        "classes": [
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI BRAIN W AND WO CONTRAST_30",
+                "percent": 0.18366254332328327,
+                "slot": 45,
+                "name": "MRI BRAIN W AND WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI BRAIN WO CONTRAST_30",
+                "percent": 0.1680520724731607,
+                "slot": 30,
+                "name": "MRI BRAIN WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI LUMBAR SPINE WO CONTRAST_30",
+                "percent": 0.10577925554397137,
+                "slot": 30,
+                "name": "MRI LUMBAR SPINE WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI ABDOMEN W AND WO CONTRAST_45",
+                "percent": 0.0766716447349883,
+                "slot": 45,
+                "name": "MRI ABDOMEN W AND WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI BRAIN WO AND W CONTRAST_30",
+                "percent": 0.0711769844177069,
+                "slot": 45,
+                "name": "MRI BRAIN WO AND W CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI CERVICAL SPINE WO CONTRAST_30",
+                "percent": 0.060553974470962835,
+                "slot": 30,
+                "name": "MRI CERVICAL SPINE WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI PELVIS W AND WO CONTRAST_45",
+                "percent": 0.05587646876496943,
+                "slot": 60,
+                "name": "MRI PELVIS W AND WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI BREAST WO AND W CONTRAST BILAT_45",
+                "percent": 0.049649187072050495,
+                "slot": 45,
+                "name": "MRI BREAST WO AND W CONTRAST BILAT"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI ABDOMEN WO AND W CONTRAST_45",
+                "percent": 0.04125221899743583,
+                "slot": 45,
+                "name": "MRI ABDOMEN WO AND W CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI BRAIN IAC W-WO CONTRAST_45",
+                "percent": 0.03894164388965595,
+                "slot": 45,
+                "name": "MRI BRAIN IAC W-WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI PELVIS WO AND W CONTRAST_45",
+                "percent": 0.03713826819577897,
+                "slot": 60,
+                "name": "MRI PELVIS WO AND W CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI CARDIAC WO AND W CONTRAST_60",
+                "percent": 0.032827073177604325,
+                "slot": 75,
+                "name": "MRI CARDIAC WO AND W CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI ABDOMEN - PELVIS ENTEROGRAPHY W-WO CONTRAST_60",
+                "percent": 0.029727521203753274,
+                "slot": 60,
+                "name": "MRI ABDOMEN - PELVIS ENTEROGRAPHY W-WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRA HEAD WO CONTRAST_15",
+                "percent": 0.027360590605539744,
+                "slot": 15,
+                "name": "MRA HEAD WO CONTRAST"
+            },
+            {
+                "latenessDistribution": "uniform(0,0)",
+                "durationDistribution": "Duration_MRI BRAIN W AND WO CONT-CORNELL MS DATABASE-SG|MRI CERVICAL SPINE W AND WO CONT-CORNELL MS DATABASE-SG_90",
+                "percent": 0.021330553129138605,
+                "slot": 90,
+                "name": "MRI BRAIN W AND WO CONT-CORNELL MS DATABASE-SG|MRI CERVICAL SPINE W AND WO CONT-CORNELL MS DATABASE-SG"
+            }
+        ],
+        "SDAOPRate": 0.1,
+        "volunteerProbability": 0.5,
+        "cancelProbability": 0.02
+    },
+    "sites": {
+        "Site3": {
             "horizon": {
-                "begin": 450,
-                "end": 1320
+                "end": 1320,
+                "begin": 450
             },
             "machines": [
                 "MR1"
@@ -21,8 +134,17 @@
         },
         "Site5": {
             "horizon": {
-                "begin": 450,
-                "end": 1320
+                "end": 1320,
+                "begin": 450
+            },
+            "machines": [
+                "MR1"
+            ]
+        },
+        "Site1": {
+            "horizon": {
+                "end": 1320,
+                "begin": 450
             },
             "machines": [
                 "MR1"
@@ -30,26 +152,8 @@
         },
         "Site4": {
             "horizon": {
-                "begin": 450,
-                "end": 1320
-            },
-            "machines": [
-                "MR1"
-            ]
-        },
-        "Site2": {
-            "horizon": {
-                "begin": 450,
-                "end": 1320
-            },
-            "machines": [
-                "MR1"
-            ]
-        },
-        "Site3": {
-            "horizon": {
-                "begin": 450,
-                "end": 1320
+                "end": 1320,
+                "begin": 450
             },
             "machines": [
                 "MR1"
@@ -57,135 +161,31 @@
         },
         "Site6": {
             "horizon": {
-                "begin": 450,
-                "end": 1320
+                "end": 1320,
+                "begin": 450
+            },
+            "machines": [
+                "MR1"
+            ]
+        },
+        "Site7": {
+            "horizon": {
+                "end": 1320,
+                "begin": 450
+            },
+            "machines": [
+                "MR1"
+            ]
+        },
+        "Site2": {
+            "horizon": {
+                "end": 1320,
+                "begin": 450
             },
             "machines": [
                 "MR1"
             ]
         }
     },
-    "patient": {
-        "classes": [
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.18366254332328327,
-                "slot": 45,
-                "durationDistribution": "Duration_MRI BRAIN W AND WO CONTRAST_30",
-                "name": "MRI BRAIN W AND WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.1680520724731607,
-                "slot": 30,
-                "durationDistribution": "Duration_MRI BRAIN WO CONTRAST_30",
-                "name": "MRI BRAIN WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.10577925554397137,
-                "slot": 30,
-                "durationDistribution": "Duration_MRI LUMBAR SPINE WO CONTRAST_30",
-                "name": "MRI LUMBAR SPINE WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.0766716447349883,
-                "slot": 45,
-                "durationDistribution": "Duration_MRI ABDOMEN W AND WO CONTRAST_45",
-                "name": "MRI ABDOMEN W AND WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.0711769844177069,
-                "slot": 45,
-                "durationDistribution": "Duration_MRI BRAIN WO AND W CONTRAST_30",
-                "name": "MRI BRAIN WO AND W CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.060553974470962835,
-                "slot": 30,
-                "durationDistribution": "Duration_MRI CERVICAL SPINE WO CONTRAST_30",
-                "name": "MRI CERVICAL SPINE WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.05587646876496943,
-                "slot": 60,
-                "durationDistribution": "Duration_MRI PELVIS W AND WO CONTRAST_45",
-                "name": "MRI PELVIS W AND WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.049649187072050495,
-                "slot": 45,
-                "durationDistribution": "Duration_MRI BREAST WO AND W CONTRAST BILAT_45",
-                "name": "MRI BREAST WO AND W CONTRAST BILAT"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.04125221899743583,
-                "slot": 45,
-                "durationDistribution": "Duration_MRI ABDOMEN WO AND W CONTRAST_45",
-                "name": "MRI ABDOMEN WO AND W CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.03894164388965595,
-                "slot": 45,
-                "durationDistribution": "Duration_MRI BRAIN IAC W-WO CONTRAST_45",
-                "name": "MRI BRAIN IAC W-WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.03713826819577897,
-                "slot": 60,
-                "durationDistribution": "Duration_MRI PELVIS WO AND W CONTRAST_45",
-                "name": "MRI PELVIS WO AND W CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.032827073177604325,
-                "slot": 75,
-                "durationDistribution": "Duration_MRI CARDIAC WO AND W CONTRAST_60",
-                "name": "MRI CARDIAC WO AND W CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.029727521203753274,
-                "slot": 60,
-                "durationDistribution": "Duration_MRI ABDOMEN - PELVIS ENTEROGRAPHY W-WO CONTRAST_60",
-                "name": "MRI ABDOMEN - PELVIS ENTEROGRAPHY W-WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.027360590605539744,
-                "slot": 15,
-                "durationDistribution": "Duration_MRA HEAD WO CONTRAST_15",
-                "name": "MRA HEAD WO CONTRAST"
-            },
-            {
-                "latenessDistribution": "uniform(0,0)",
-                "percent": 0.021330553129138605,
-                "slot": 90,
-                "durationDistribution": "Duration_MRI BRAIN W AND WO CONT-CORNELL MS DATABASE-SG|MRI CERVICAL SPINE W AND WO CONT-CORNELL MS DATABASE-SG_90",
-                "name": "MRI BRAIN W AND WO CONT-CORNELL MS DATABASE-SG|MRI CERVICAL SPINE W AND WO CONT-CORNELL MS DATABASE-SG"
-            }
-        ],
-        "cancelProbability": 0.02,
-        "SDAOPRate": 0.1,
-        "volunteerProbability": 0.5
-    },
-    "optimizer": {
-        "advanceTime": 60,
-        "confidenceLevel": 0.7,
-        "objective": {
-            "waitNorm": "l2",
-            "overTimeWeight": 10
-        },
-        "patientConfidenceLevel": 0.7,
-        "active": true,
-        "numSamples": 100
-    }
+    "seed": 2
 }

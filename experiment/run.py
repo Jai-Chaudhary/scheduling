@@ -19,19 +19,19 @@ def go(seed, volunteerProbability, advanceTime):
 
     return result
 
-config['patient']['cancelProbability'] = 0.02
-config['patient']['SDAOPRate'] = 0.1
+config['patient']['cancelProbability'] = 0
+config['patient']['SDAOPRate'] = 0
 
 random.seed(0)
-numReplication = 10
+numReplication = 100
 allVolunteerProbability = [0, .1, .2, .3, .4, .5, .6]
-allAdvanceTime = [60]
+allAdvanceTime = [60, 90]
 allSeeds = [random.randint(0, 2**31) for i in range(numReplication)]
 
 for volunteerProbability in allVolunteerProbability:
     for advanceTime in allAdvanceTime:
         for seed in allSeeds:
-            filename = '{}_{}.csv'.format(volunteerProbability, seed)
+            filename = '{}_{}_{}.csv'.format(volunteerProbability, advanceTime, seed)
 
             wait_file = 'data/wait/{}'.format(filename)
             overtime_file = 'data/overtime/{}'.format(filename)
